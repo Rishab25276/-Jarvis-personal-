@@ -4,113 +4,369 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>J.A.R.V.I.S — Personal Productivity System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
+  /* ============================================
+     STARK INDUSTRIES / AVENGERS HUD THEME — LIGHT
+     Iron Man inspired, daylight-readable
+     ============================================ */
+  :root {
+    --stark-red: #C8102E;
+    --stark-red-bright: #E63946;
+    --stark-gold: #D4A017;
+    --stark-gold-bright: #F4B400;
+    --hud-blue: #0066CC;
+    --hud-blue-bright: #1E88E5;
+    --bg-light: #F5F7FA;
+    --bg-card: #FFFFFF;
+    --bg-mid: #EDF1F7;
+    --bg-tint: #E8EEF6;
+    --text-dark: #0D1B2A;
+    --text-mid: #2C3E50;
+    --text-dim: #6B7C93;
+    --text-light: #8FA3BD;
+    --border: rgba(0, 102, 204, 0.15);
+    --border-strong: rgba(0, 102, 204, 0.35);
+    --grid-line: rgba(0, 102, 204, 0.05);
+    --warn: #D4A017;
+    --danger: #C8102E;
+    --success: #00875A;
+    --shadow: 0 2px 8px rgba(13, 27, 42, 0.06);
+    --shadow-lg: 0 4px 20px rgba(13, 27, 42, 0.1);
+  }
+  
   *,*::before,*::after{box-sizing:border-box}
+  
   body{
     margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    background:linear-gradient(135deg,#0a0e27 0%,#1a1f3a 50%,#0d1b3d 100%);
-    background-attachment:fixed;
-    color:#e6f1ff;
+    font-family:'Rajdhani','Segoe UI',sans-serif;
+    background:var(--bg-light);
+    color:var(--text-dark);
     min-height:100vh;
     padding:16px;
+    position:relative;
+    overflow-x:hidden;
   }
-  .container{max-width:1300px;margin:0 auto}
+  
+  /* === SUBTLE HUD GRID BACKGROUND === */
+  body::before{
+    content:'';
+    position:fixed;
+    inset:0;
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:40px 40px;
+    pointer-events:none;
+    z-index:0;
+    mask-image:radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+  
+  /* === SOFT RADIAL ACCENTS === */
+  body::after{
+    content:'';
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(0,102,204,0.04) 0%, transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(200,16,46,0.03) 0%, transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(212,160,23,0.03) 0%, transparent 50%);
+    pointer-events:none;
+    z-index:0;
+  }
+  
+  .container{
+    max-width:1300px;
+    margin:0 auto;
+    position:relative;
+    z-index:1;
+  }
 
   /* ============ HEADER ============ */
   .header{
     display:flex;
     align-items:center;
-    gap:16px;
+    gap:18px;
     margin-bottom:20px;
-    padding:18px 24px;
-    background:rgba(0,212,255,0.05);
-    border:1px solid rgba(0,212,255,0.2);
-    border-radius:12px;
+    padding:20px 28px;
+    background:linear-gradient(135deg, #FFFFFF 0%, var(--bg-mid) 100%);
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    position:relative;
+    clip-path:polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
   }
+  
+  .header::before, .header::after{
+    content:'';
+    position:absolute;
+    width:20px;
+    height:20px;
+    border:2px solid var(--stark-gold);
+  }
+  .header::before{
+    top:6px; left:6px;
+    border-right:none;
+    border-bottom:none;
+  }
+  .header::after{
+    bottom:6px; right:6px;
+    border-left:none;
+    border-top:none;
+  }
+  
+  /* === ARC REACTOR === */
   .arc-reactor{
-    width:50px;height:50px;
+    width:60px;
+    height:60px;
     border-radius:50%;
-    background:radial-gradient(circle,#00d4ff 0%,#0088ff 60%,#003d80 100%);
-    box-shadow:0 0 30px rgba(0,212,255,0.6),inset 0 0 10px rgba(255,255,255,0.3);
-    animation:pulse 2s ease-in-out infinite;
+    background:
+      radial-gradient(circle, #FFFFFF 0%, #4FC3F7 20%, var(--hud-blue) 50%, #003D7A 100%);
+    box-shadow:
+      0 0 20px rgba(0,102,204,0.5),
+      0 0 40px rgba(0,102,204,0.3),
+      inset 0 0 12px rgba(255,255,255,0.6);
     flex-shrink:0;
+    position:relative;
+    animation:reactor-pulse 2s ease-in-out infinite;
   }
-  @keyframes pulse{
-    0%,100%{box-shadow:0 0 30px rgba(0,212,255,0.6),inset 0 0 10px rgba(255,255,255,0.3)}
-    50%{box-shadow:0 0 50px rgba(0,212,255,0.9),inset 0 0 15px rgba(255,255,255,0.5)}
+  
+  .arc-reactor::before{
+    content:'';
+    position:absolute;
+    inset:-8px;
+    border-radius:50%;
+    border:2px solid var(--stark-gold);
+    border-right-color:transparent;
+    border-bottom-color:transparent;
+    animation:rotate 4s linear infinite;
   }
+  .arc-reactor::after{
+    content:'';
+    position:absolute;
+    inset:30%;
+    border-radius:50%;
+    background:#FFFFFF;
+    box-shadow:0 0 12px #FFFFFF, 0 0 24px rgba(0,102,204,0.6);
+  }
+  
+  /* Listening state for voice */
+  .arc-reactor.listening{
+    animation:listening-pulse 0.8s ease-in-out infinite;
+  }
+  .arc-reactor.listening::before{
+    border-color:var(--stark-red);
+    border-right-color:transparent;
+    animation:rotate 1s linear infinite;
+  }
+  
+  @keyframes reactor-pulse{
+    0%,100%{box-shadow:0 0 20px rgba(0,102,204,0.5),0 0 40px rgba(0,102,204,0.3),inset 0 0 12px rgba(255,255,255,0.6)}
+    50%{box-shadow:0 0 30px rgba(0,102,204,0.7),0 0 60px rgba(0,102,204,0.4),inset 0 0 18px rgba(255,255,255,0.8)}
+  }
+  
+  @keyframes listening-pulse{
+    0%,100%{box-shadow:0 0 25px rgba(200,16,46,0.6),0 0 50px rgba(200,16,46,0.4),inset 0 0 15px rgba(255,255,255,0.7);transform:scale(1)}
+    50%{box-shadow:0 0 40px rgba(200,16,46,0.9),0 0 80px rgba(200,16,46,0.6),inset 0 0 20px rgba(255,255,255,0.9);transform:scale(1.05)}
+  }
+  
+  @keyframes rotate{
+    from{transform:rotate(0deg)}
+    to{transform:rotate(360deg)}
+  }
+  
   .header-text{flex:1}
   h1{
     margin:0;
-    font-size:22px;
-    font-weight:300;
+    font-family:'Orbitron',sans-serif;
+    font-size:26px;
+    font-weight:900;
+    letter-spacing:6px;
+    color:var(--text-dark);
+    position:relative;
+  }
+  h1 .accent-gold{
+    background:linear-gradient(90deg, var(--stark-gold) 0%, var(--stark-gold-bright) 50%, var(--stark-gold) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  
+  .tagline{
+    color:var(--hud-blue);
+    font-family:'Share Tech Mono',monospace;
+    font-size:11px;
+    margin-top:4px;
     letter-spacing:3px;
-    color:#00d4ff;
-    text-shadow:0 0 20px rgba(0,212,255,0.5);
+    text-transform:uppercase;
+    opacity:0.85;
   }
-  .tagline{color:#8fa3c7;font-size:12px;margin-top:3px;letter-spacing:1px}
+  .tagline::before{content:'> '}
+  .tagline::after{content:' _'; animation:blink 1s step-end infinite}
+  
+  @keyframes blink{50%{opacity:0}}
+  
   .header-stats{
-    display:flex;gap:20px;font-size:12px;
+    display:flex;
+    gap:14px;
+    font-size:12px;
   }
-  .stat{text-align:center}
-  .stat-value{font-size:18px;font-weight:600;color:#00d4ff}
-  .stat-label{color:#5a6f93;letter-spacing:1px;font-size:10px;text-transform:uppercase}
+  .stat{
+    text-align:center;
+    padding:8px 16px;
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:2px;
+    box-shadow:var(--shadow);
+  }
+  .stat-value{
+    font-family:'Orbitron',sans-serif;
+    font-size:22px;
+    font-weight:700;
+    color:var(--hud-blue);
+    line-height:1;
+  }
+  .stat-label{
+    color:var(--text-dim);
+    letter-spacing:2px;
+    font-size:9px;
+    text-transform:uppercase;
+    margin-top:4px;
+    font-family:'Share Tech Mono',monospace;
+  }
+  
+  /* === VOICE TOGGLE BUTTON === */
+  .voice-toggle{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 18px;
+    background:linear-gradient(135deg, var(--stark-red) 0%, #8B0A20 100%);
+    color:#FFFFFF;
+    border:none;
+    font-family:'Orbitron',sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all 0.2s;
+    box-shadow:var(--shadow);
+    clip-path:polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  }
+  .voice-toggle:hover{
+    background:linear-gradient(135deg, var(--stark-red-bright), var(--stark-red));
+    box-shadow:0 4px 12px rgba(200,16,46,0.3);
+  }
+  .voice-toggle.active{
+    background:linear-gradient(135deg, var(--success), #00A86B);
+    animation:voice-glow 1.5s ease-in-out infinite;
+  }
+  @keyframes voice-glow{
+    0%,100%{box-shadow:0 0 10px rgba(0,135,90,0.4)}
+    50%{box-shadow:0 0 20px rgba(0,135,90,0.7)}
+  }
+  .voice-toggle .mic-icon{
+    width:14px; height:14px;
+    background:currentColor;
+    -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3zM7 11a5 5 0 0010 0h2a7 7 0 01-6 6.93V21h-2v-3.07A7 7 0 015 11h2z'/></svg>") center/contain no-repeat;
+    mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3zM7 11a5 5 0 0010 0h2a7 7 0 01-6 6.93V21h-2v-3.07A7 7 0 015 11h2z'/></svg>") center/contain no-repeat;
+  }
 
   /* ============ TABS ============ */
   .tabs{
     display:flex;
-    gap:4px;
+    gap:2px;
     margin-bottom:16px;
-    padding:4px;
-    background:rgba(10,20,40,0.5);
-    border:1px solid rgba(0,212,255,0.15);
-    border-radius:10px;
+    padding:6px;
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
     overflow-x:auto;
+    position:relative;
+    clip-path:polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
   }
   .tab{
     flex:1;
     min-width:fit-content;
-    padding:10px 16px;
+    padding:11px 18px;
     background:transparent;
     border:none;
-    color:#8fa3c7;
+    color:var(--text-mid);
+    font-family:'Rajdhani',sans-serif;
     font-size:13px;
-    font-weight:500;
-    letter-spacing:1px;
+    font-weight:600;
+    letter-spacing:2px;
     cursor:pointer;
-    border-radius:6px;
+    text-transform:uppercase;
     transition:all 0.2s;
-    font-family:inherit;
     white-space:nowrap;
+    position:relative;
   }
-  .tab:hover{background:rgba(0,212,255,0.08);color:#00d4ff}
+  .tab:hover{
+    color:var(--hud-blue);
+    background:var(--bg-tint);
+  }
   .tab.active{
-    background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(0,136,255,0.15));
-    color:#00d4ff;
-    box-shadow:inset 0 -2px 0 #00d4ff;
+    background:linear-gradient(180deg, rgba(212,160,23,0.15), rgba(200,16,46,0.08));
+    color:var(--stark-red);
+    border-bottom:2px solid var(--stark-gold);
+  }
+  .tab.active::before{
+    content:'◆';
+    position:absolute;
+    top:-3px;
+    left:50%;
+    transform:translateX(-50%);
+    color:var(--stark-gold);
+    font-size:8px;
   }
 
   /* ============ PANELS ============ */
   .panel{
-    background:rgba(10,20,40,0.6);
-    border:1px solid rgba(0,212,255,0.2);
-    border-radius:12px;
-    padding:20px;
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    padding:22px;
     margin-bottom:16px;
-    backdrop-filter:blur(10px);
+    box-shadow:var(--shadow);
+    position:relative;
+    clip-path:polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
   }
+  
+  .panel::before{
+    content:'';
+    position:absolute;
+    top:0; left:0;
+    width:30px; height:2px;
+    background:linear-gradient(90deg, var(--hud-blue), transparent);
+  }
+  .panel::after{
+    content:'';
+    position:absolute;
+    top:0; left:0;
+    width:2px; height:30px;
+    background:linear-gradient(180deg, var(--hud-blue), transparent);
+  }
+  
   .panel-title{
+    font-family:'Orbitron',sans-serif;
     font-size:13px;
-    font-weight:500;
-    color:#00d4ff;
-    letter-spacing:2px;
-    margin:0 0 14px;
-    padding-bottom:10px;
-    border-bottom:1px solid rgba(0,212,255,0.2);
+    font-weight:700;
+    color:var(--stark-red);
+    letter-spacing:3px;
+    margin:0 0 16px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--border);
     display:flex;
     align-items:center;
-    gap:8px;
+    gap:10px;
+    text-transform:uppercase;
+  }
+  .panel-title::before{
+    content:'▸';
+    color:var(--stark-gold);
+    font-size:14px;
   }
   .panel-title .panel-action{
     margin-left:auto;
@@ -124,278 +380,474 @@
   .form-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:12px;
-    margin-bottom:14px;
+    gap:14px;
+    margin-bottom:16px;
   }
   @media(max-width:700px){.form-grid{grid-template-columns:1fr}}
   .form-grid.full{grid-template-columns:1fr}
   .form-field label{
     display:block;
-    font-size:11px;
-    color:#8fa3c7;
-    letter-spacing:1px;
+    font-family:'Share Tech Mono',monospace;
+    font-size:10px;
+    color:var(--hud-blue);
+    letter-spacing:2px;
     text-transform:uppercase;
-    margin-bottom:5px;
+    margin-bottom:6px;
+    font-weight:600;
   }
+  .form-field label::before{content:'[ '}
+  .form-field label::after{content:' ]'}
+  
   input,select,textarea{
     width:100%;
-    padding:9px 12px;
-    background:rgba(0,0,0,0.3);
-    border:1px solid rgba(0,212,255,0.25);
-    border-radius:6px;
-    color:#e6f1ff;
-    font-size:13px;
-    font-family:inherit;
+    padding:10px 14px;
+    background:var(--bg-light);
+    border:1px solid var(--border);
+    color:var(--text-dark);
+    font-family:'Rajdhani',sans-serif;
+    font-size:14px;
+    font-weight:500;
     outline:none;
-    transition:border-color 0.2s;
+    transition:all 0.2s;
+    border-radius:0;
+    letter-spacing:0.3px;
   }
   input:focus,select:focus,textarea:focus{
-    border-color:#00d4ff;
-    box-shadow:0 0 8px rgba(0,212,255,0.2);
+    border-color:var(--hud-blue);
+    box-shadow:0 0 0 3px rgba(0,102,204,0.1);
+    background:#FFFFFF;
   }
-  input::placeholder,textarea::placeholder{color:#5a6f93}
-  textarea{resize:vertical;min-height:60px;font-family:inherit}
+  input::placeholder,textarea::placeholder{color:var(--text-light)}
+  textarea{resize:vertical;min-height:70px;font-family:'Rajdhani',sans-serif}
   select{cursor:pointer}
-  select option{background:#1a1f3a;color:#e6f1ff}
+  select option{background:#FFFFFF;color:var(--text-dark)}
 
   /* ============ BUTTONS ============ */
   .btn{
-    padding:9px 18px;
-    background:linear-gradient(135deg,#00d4ff,#0088ff);
-    color:#0a0e27;
+    padding:10px 22px;
+    background:linear-gradient(135deg, var(--stark-red), #A00D24);
+    color:#FFFFFF;
     border:none;
-    border-radius:6px;
-    font-weight:600;
+    font-family:'Orbitron',sans-serif;
+    font-weight:700;
     cursor:pointer;
-    font-size:13px;
-    letter-spacing:1px;
-    font-family:inherit;
+    font-size:12px;
+    letter-spacing:2px;
+    text-transform:uppercase;
     transition:all 0.2s;
+    position:relative;
+    box-shadow:var(--shadow);
+    clip-path:polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
   }
-  .btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,212,255,0.4)}
-  .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+  .btn:hover{
+    background:linear-gradient(135deg, var(--stark-red-bright), var(--stark-red));
+    box-shadow:0 4px 14px rgba(200,16,46,0.35);
+    transform:translateY(-1px);
+  }
+  .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+  
   .btn-secondary{
-    background:transparent;
-    color:#8fa3c7;
-    border:1px solid rgba(0,212,255,0.3);
+    background:var(--bg-card);
+    color:var(--hud-blue);
+    border:1px solid var(--border-strong);
   }
-  .btn-secondary:hover{background:rgba(0,212,255,0.1);color:#00d4ff;transform:none;box-shadow:none}
-  .btn-danger{background:linear-gradient(135deg,#ff4757,#c41e3a);color:white}
-  .btn-sm{padding:5px 10px;font-size:11px}
+  .btn-secondary:hover{
+    background:var(--bg-tint);
+    box-shadow:0 4px 10px rgba(0,102,204,0.15);
+  }
+  .btn-danger{
+    background:linear-gradient(135deg, var(--danger), #8B0A20);
+  }
+  .btn-sm{padding:6px 14px;font-size:10px}
 
-  /* ============ TYPE PICKER (Meeting/Deliverable/Learning) ============ */
+  /* ============ TYPE PICKER ============ */
   .type-picker{
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    gap:8px;
-    margin-bottom:16px;
+    gap:10px;
+    margin-bottom:18px;
   }
   .type-btn{
-    padding:14px;
-    background:rgba(0,212,255,0.05);
-    border:1px solid rgba(0,212,255,0.2);
-    border-radius:8px;
-    color:#8fa3c7;
+    padding:18px 14px;
+    background:var(--bg-light);
+    border:1px solid var(--border);
+    color:var(--text-mid);
     cursor:pointer;
     text-align:center;
-    transition:all 0.2s;
-    font-family:inherit;
+    transition:all 0.25s;
+    font-family:'Orbitron',sans-serif;
+    position:relative;
+    clip-path:polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   }
-  .type-btn:hover{background:rgba(0,212,255,0.1);color:#e6f1ff}
+  .type-btn:hover{
+    background:var(--bg-tint);
+    color:var(--hud-blue);
+    border-color:var(--hud-blue);
+  }
   .type-btn.selected{
-    background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(0,136,255,0.15));
-    border-color:#00d4ff;
-    color:#00d4ff;
+    background:linear-gradient(135deg, rgba(212,160,23,0.15), rgba(200,16,46,0.08));
+    border-color:var(--stark-gold);
+    color:var(--stark-red);
+    box-shadow:0 4px 12px rgba(212,160,23,0.2);
   }
-  .type-btn .emoji{font-size:24px;display:block;margin-bottom:4px}
-  .type-btn .label{font-size:12px;font-weight:500;letter-spacing:1px}
+  .type-btn .emoji{font-size:28px;display:block;margin-bottom:6px}
+  .type-btn .label{font-size:11px;font-weight:700;letter-spacing:2px}
 
   /* ============ TASK LIST ============ */
   .task-list{display:flex;flex-direction:column;gap:8px}
   .task-item{
     display:flex;
     align-items:center;
-    gap:12px;
-    padding:12px 14px;
-    background:rgba(0,212,255,0.05);
-    border-left:3px solid #00d4ff;
-    border-radius:0 8px 8px 0;
+    gap:14px;
+    padding:14px 16px;
+    background:var(--bg-light);
+    border-left:3px solid var(--hud-blue);
     transition:all 0.2s;
+    position:relative;
   }
-  .task-item:hover{background:rgba(0,212,255,0.08)}
-  .task-item.completed{opacity:0.55;border-left-color:#00ff88}
-  .task-item.overdue{border-left-color:#ff4757}
+  .task-item:hover{
+    background:var(--bg-tint);
+    box-shadow:inset 0 0 0 1px var(--border);
+  }
+  .task-item.completed{
+    opacity:0.55;
+    border-left-color:var(--success);
+    background:#F0F9F4;
+  }
+  .task-item.overdue{
+    border-left-color:var(--danger);
+    background:#FDF3F5;
+  }
   .task-item.completed .task-title{text-decoration:line-through}
+  
   .task-checkbox{
-    width:18px;height:18px;
-    border:2px solid rgba(0,212,255,0.4);
-    border-radius:4px;
+    width:22px;height:22px;
+    border:2px solid var(--hud-blue);
     cursor:pointer;
     flex-shrink:0;
     display:flex;align-items:center;justify-content:center;
-    background:transparent;
+    background:#FFFFFF;
+    transition:all 0.2s;
+    position:relative;
   }
-  .task-checkbox.checked{background:#00ff88;border-color:#00ff88}
-  .task-checkbox.checked::after{content:'✓';color:#0a0e27;font-weight:bold;font-size:12px}
+  .task-checkbox:hover{box-shadow:0 0 0 3px rgba(0,102,204,0.15)}
+  .task-checkbox.checked{
+    background:var(--success);
+    border-color:var(--success);
+  }
+  .task-checkbox.checked::after{content:'✓';color:#FFFFFF;font-weight:bold;font-size:14px}
+  
   .task-info{flex:1;min-width:0}
-  .task-title{font-size:14px;color:#e6f1ff;margin-bottom:3px;font-weight:500}
-  .task-meta{font-size:11px;color:#8fa3c7;display:flex;gap:10px;flex-wrap:wrap}
+  .task-title{
+    font-family:'Rajdhani',sans-serif;
+    font-size:15px;
+    color:var(--text-dark);
+    margin-bottom:4px;
+    font-weight:600;
+    letter-spacing:0.3px;
+  }
+  .task-meta{font-size:11px;color:var(--text-dim);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .task-meta span{display:inline-flex;align-items:center;gap:3px}
-  .task-actions{display:flex;gap:4px;opacity:0.7}
+  .task-actions{display:flex;gap:4px}
+  
   .icon-btn{
     background:transparent;
-    border:1px solid rgba(0,212,255,0.2);
-    color:#8fa3c7;
-    width:26px;height:26px;
-    border-radius:5px;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    width:28px;height:28px;
     cursor:pointer;
-    font-size:12px;
+    font-size:14px;
     display:flex;align-items:center;justify-content:center;
+    transition:all 0.2s;
   }
-  .icon-btn:hover{background:rgba(0,212,255,0.1);color:#00d4ff}
-  .icon-btn.delete:hover{background:rgba(255,71,87,0.2);color:#ff4757;border-color:#ff4757}
+  .icon-btn:hover{background:var(--bg-tint);color:var(--hud-blue)}
+  .icon-btn.delete:hover{background:#FDF3F5;color:var(--danger);border-color:var(--danger)}
 
   /* ============ BADGES ============ */
   .badge{
     display:inline-block;
+    font-family:'Share Tech Mono',monospace;
     font-size:10px;
-    padding:2px 8px;
-    border-radius:10px;
-    letter-spacing:0.5px;
+    padding:3px 10px;
+    letter-spacing:1px;
     text-transform:uppercase;
-    font-weight:600;
+    font-weight:700;
+    clip-path:polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
   }
-  .badge-meeting{background:rgba(187,134,252,0.2);color:#bb86fc}
-  .badge-deliverable{background:rgba(0,212,255,0.2);color:#00d4ff}
-  .badge-learning{background:rgba(255,180,0,0.2);color:#ffb400}
-  .badge-high{background:rgba(255,71,87,0.2);color:#ff6b7a}
-  .badge-medium{background:rgba(255,180,0,0.2);color:#ffb400}
-  .badge-low{background:rgba(0,255,136,0.2);color:#00ff88}
-  .badge-overdue{background:rgba(255,71,87,0.3);color:#ff6b7a;animation:pulse-badge 2s ease-in-out infinite}
-  @keyframes pulse-badge{0%,100%{opacity:1}50%{opacity:0.6}}
+  .badge-meeting{background:#F3E8FD;color:#7C3AED;border:1px solid #DDD0FF}
+  .badge-deliverable{background:#E3F2FD;color:var(--hud-blue);border:1px solid #B3DDF7}
+  .badge-learning{background:#FFF8E1;color:#B8860B;border:1px solid #F4D578}
+  .badge-high{background:#FFE5EA;color:var(--danger);border:1px solid #FFB3C0}
+  .badge-medium{background:#FFF8E1;color:#B8860B;border:1px solid #F4D578}
+  .badge-low{background:#E8F5E9;color:var(--success);border:1px solid #B5D9BC}
+  .badge-overdue{
+    background:#FFE5EA;
+    color:var(--danger);
+    border:1px solid var(--danger);
+    animation:pulse-badge 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse-badge{
+    0%,100%{opacity:1;box-shadow:0 0 0 rgba(200,16,46,0)}
+    50%{opacity:0.7;box-shadow:0 0 12px rgba(200,16,46,0.3)}
+  }
 
   /* ============ DASHBOARD GRID ============ */
   .dashboard-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:12px;
+    gap:14px;
     margin-bottom:16px;
   }
   .stat-card{
-    background:rgba(0,212,255,0.05);
-    border:1px solid rgba(0,212,255,0.2);
-    border-radius:10px;
-    padding:16px;
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    padding:20px;
+    position:relative;
+    box-shadow:var(--shadow);
+    clip-path:polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+    transition:all 0.2s;
+  }
+  .stat-card:hover{
+    border-color:var(--hud-blue);
+    box-shadow:var(--shadow-lg);
+  }
+  .stat-card::before{
+    content:'';
+    position:absolute;
+    top:0; left:0;
+    width:40%; height:2px;
+    background:var(--hud-blue);
   }
   .stat-card .number{
-    font-size:28px;
-    font-weight:600;
-    color:#00d4ff;
-    margin:6px 0;
+    font-family:'Orbitron',sans-serif;
+    font-size:34px;
+    font-weight:900;
+    color:var(--hud-blue);
+    margin:8px 0;
+    line-height:1;
   }
   .stat-card .label{
-    font-size:11px;
-    color:#8fa3c7;
-    letter-spacing:1px;
+    font-family:'Share Tech Mono',monospace;
+    font-size:10px;
+    color:var(--text-dim);
+    letter-spacing:2px;
     text-transform:uppercase;
+    font-weight:600;
   }
-  .stat-card.warning .number{color:#ffb400}
-  .stat-card.danger .number{color:#ff4757}
-  .stat-card.success .number{color:#00ff88}
+  .stat-card.warning .number{color:var(--stark-gold)}
+  .stat-card.warning::before{background:var(--stark-gold)}
+  .stat-card.danger .number{color:var(--danger)}
+  .stat-card.danger::before{background:var(--danger)}
+  .stat-card.success .number{color:var(--success)}
+  .stat-card.success::before{background:var(--success)}
 
   /* ============ AGENT MESSAGES ============ */
   .agent-message{
-    padding:14px 16px;
-    background:rgba(0,212,255,0.06);
-    border-left:3px solid #00d4ff;
-    border-radius:0 8px 8px 0;
-    margin-bottom:10px;
+    padding:16px 18px;
+    background:var(--bg-light);
+    border-left:3px solid var(--hud-blue);
+    margin-bottom:12px;
     animation:slideIn 0.4s ease;
+    position:relative;
+  }
+  .agent-message::before{
+    content:'';
+    position:absolute;
+    top:0; right:0;
+    width:60px; height:1px;
+    background:linear-gradient(90deg, transparent, var(--hud-blue));
   }
   @keyframes slideIn{
-    from{opacity:0;transform:translateX(-10px)}
+    from{opacity:0;transform:translateX(-15px)}
     to{opacity:1;transform:translateX(0)}
   }
-  .agent-message.tracker{border-left-color:#00d4ff}
-  .agent-message.coach{border-left-color:#ffb400}
-  .agent-message.analyst{border-left-color:#bb86fc}
+  .agent-message.tracker{
+    border-left-color:var(--hud-blue);
+    background:linear-gradient(90deg, #E3F2FD, var(--bg-light));
+  }
+  .agent-message.coach{
+    border-left-color:var(--stark-gold);
+    background:linear-gradient(90deg, #FFF8E1, var(--bg-light));
+  }
+  .agent-message.coach::before{background:linear-gradient(90deg, transparent, var(--stark-gold))}
+  .agent-message.analyst{
+    border-left-color:#7C3AED;
+    background:linear-gradient(90deg, #F3E8FD, var(--bg-light));
+  }
+  .agent-message.analyst::before{background:linear-gradient(90deg, transparent, #7C3AED)}
+  .agent-message.jarvis-voice{
+    border-left-color:var(--stark-red);
+    background:linear-gradient(90deg, #FFE5EA, var(--bg-light));
+  }
+  .agent-message.jarvis-voice::before{background:linear-gradient(90deg, transparent, var(--stark-red))}
+  
   .agent-header{
     display:flex;
     align-items:center;
-    gap:8px;
-    margin-bottom:8px;
+    gap:10px;
+    margin-bottom:10px;
+    font-family:'Orbitron',sans-serif;
     font-size:11px;
-    letter-spacing:1px;
-    font-weight:600;
+    letter-spacing:2px;
+    font-weight:700;
     text-transform:uppercase;
   }
-  .agent-header .agent-name{color:#00d4ff}
-  .agent-message.coach .agent-name{color:#ffb400}
-  .agent-message.analyst .agent-name{color:#bb86fc}
-  .agent-body{font-size:13px;color:#e6f1ff;line-height:1.6}
-  .agent-body ul{margin:6px 0;padding-left:20px}
-  .agent-body li{margin:3px 0}
-  .agent-body strong{color:#00d4ff;font-weight:500}
+  .agent-header .agent-name{color:var(--hud-blue)}
+  .agent-message.coach .agent-name{color:#B8860B}
+  .agent-message.analyst .agent-name{color:#7C3AED}
+  .agent-message.jarvis-voice .agent-name{color:var(--stark-red)}
+  .agent-body{
+    font-family:'Rajdhani',sans-serif;
+    font-size:14px;
+    color:var(--text-dark);
+    line-height:1.7;
+    font-weight:400;
+  }
+  .agent-body ul{margin:8px 0;padding-left:22px}
+  .agent-body li{margin:4px 0}
+  .agent-body strong{color:var(--stark-red);font-weight:700}
 
   /* ============ EMPTY STATES ============ */
   .empty{
     text-align:center;
-    padding:40px 20px;
-    color:#5a6f93;
+    padding:50px 20px;
+    color:var(--text-dim);
+    font-family:'Share Tech Mono',monospace;
+    letter-spacing:1px;
   }
-  .empty .icon{font-size:36px;margin-bottom:10px}
+  .empty .icon{font-size:42px;margin-bottom:14px;opacity:0.6}
 
-  /* ============ CHART (custom CSS bars) ============ */
-  .chart-container{margin-top:14px}
+  /* ============ CHART ============ */
+  .chart-container{margin-top:16px}
   .chart-row{
     display:grid;
-    grid-template-columns:90px 1fr 50px;
-    gap:10px;
+    grid-template-columns:110px 1fr 60px;
+    gap:12px;
     align-items:center;
-    margin-bottom:8px;
+    margin-bottom:10px;
     font-size:12px;
   }
-  .chart-label{color:#8fa3c7}
+  .chart-label{
+    color:var(--text-mid);
+    font-family:'Share Tech Mono',monospace;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    font-weight:600;
+  }
   .chart-bar-wrap{
-    background:rgba(0,212,255,0.08);
-    border-radius:4px;
-    height:18px;
+    background:var(--bg-tint);
+    border:1px solid var(--border);
+    height:22px;
     overflow:hidden;
+    position:relative;
   }
   .chart-bar{
     height:100%;
-    background:linear-gradient(90deg,#00d4ff,#0088ff);
-    border-radius:4px;
-    transition:width 0.5s ease;
+    background:linear-gradient(90deg, var(--hud-blue), var(--hud-blue-bright));
+    transition:width 0.6s ease;
+    position:relative;
   }
-  .chart-bar.meeting{background:linear-gradient(90deg,#bb86fc,#9d6ae0)}
-  .chart-bar.deliverable{background:linear-gradient(90deg,#00d4ff,#0088ff)}
-  .chart-bar.learning{background:linear-gradient(90deg,#ffb400,#ff8800)}
-  .chart-value{color:#e6f1ff;font-weight:500;text-align:right}
+  .chart-bar.meeting{background:linear-gradient(90deg, #9D6AE0, #7C3AED)}
+  .chart-bar.deliverable{background:linear-gradient(90deg, var(--hud-blue), var(--hud-blue-bright))}
+  .chart-bar.learning{background:linear-gradient(90deg, var(--stark-gold), #B8860B)}
+  .chart-value{
+    font-family:'Orbitron',sans-serif;
+    color:var(--text-dark);
+    font-weight:700;
+    text-align:right;
+  }
 
   /* ============ MISC ============ */
-  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .footer{text-align:center;margin-top:24px;color:#5a6f93;font-size:11px;letter-spacing:1px}
-  .footer .arc-mini{
-    display:inline-block;width:8px;height:8px;
-    border-radius:50%;background:#00d4ff;
-    box-shadow:0 0 8px #00d4ff;
-    vertical-align:middle;margin:0 4px;
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .footer{
+    text-align:center;
+    margin-top:28px;
+    padding:14px;
+    color:var(--text-dim);
+    font-family:'Share Tech Mono',monospace;
+    font-size:10px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    border-top:1px solid var(--border);
   }
-  .filter-bar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .footer .arc-mini{
+    display:inline-block;
+    width:8px;height:8px;
+    border-radius:50%;
+    background:var(--hud-blue);
+    vertical-align:middle;
+    margin:0 6px;
+    animation:reactor-pulse 2s ease-in-out infinite;
+  }
+  
+  .filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
   .filter-chip{
-    padding:5px 12px;
-    background:transparent;
-    border:1px solid rgba(0,212,255,0.25);
-    border-radius:14px;
-    color:#8fa3c7;
+    padding:6px 14px;
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    color:var(--text-mid);
+    font-family:'Share Tech Mono',monospace;
     font-size:11px;
     cursor:pointer;
-    font-family:inherit;
-    letter-spacing:0.5px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    transition:all 0.2s;
+    font-weight:600;
+    clip-path:polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
   }
-  .filter-chip:hover{color:#00d4ff;border-color:#00d4ff}
-  .filter-chip.active{background:rgba(0,212,255,0.15);color:#00d4ff;border-color:#00d4ff}
+  .filter-chip:hover{
+    color:var(--hud-blue);
+    border-color:var(--hud-blue);
+    background:var(--bg-tint);
+  }
+  .filter-chip.active{
+    background:var(--stark-red);
+    color:#FFFFFF;
+    border-color:var(--stark-red);
+  }
+  
+  /* === VOICE LISTENING OVERLAY === */
+  .voice-overlay{
+    position:fixed;
+    bottom:30px;
+    right:30px;
+    z-index:1000;
+    background:var(--bg-card);
+    border:2px solid var(--stark-red);
+    padding:16px 24px;
+    box-shadow:0 8px 32px rgba(200,16,46,0.25);
+    font-family:'Orbitron',sans-serif;
+    font-size:13px;
+    font-weight:700;
+    color:var(--stark-red);
+    letter-spacing:2px;
+    text-transform:uppercase;
+    display:none;
+    align-items:center;
+    gap:12px;
+    clip-path:polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  }
+  .voice-overlay.show{display:flex;animation:slideUp 0.3s ease}
+  @keyframes slideUp{
+    from{opacity:0;transform:translateY(20px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  .voice-overlay .pulse-dot{
+    width:10px;height:10px;
+    border-radius:50%;
+    background:var(--stark-red);
+    animation:listening-pulse 0.8s ease-in-out infinite;
+  }
+  .voice-overlay .transcript{
+    color:var(--text-dark);
+    font-family:'Rajdhani',sans-serif;
+    text-transform:none;
+    letter-spacing:0;
+    font-weight:500;
+    font-size:13px;
+    margin-left:4px;
+    max-width:300px;
+  }
 </style>
 </head>
 <body>
@@ -403,10 +855,10 @@
 
   <!-- ============ HEADER ============ -->
   <div class="header">
-    <div class="arc-reactor"></div>
+    <div class="arc-reactor" id="arc-reactor"></div>
     <div class="header-text">
       <h1>J.A.R.V.I.S</h1>
-      <div class="tagline">PERSONAL PRODUCTIVITY SYSTEM</div>
+      <div class="tagline">STARK INDUSTRIES // OPERATIONS PROTOCOL v2.0</div>
     </div>
     <div class="header-stats">
       <div class="stat">
@@ -422,6 +874,10 @@
         <div class="stat-label">This Week</div>
       </div>
     </div>
+    <button class="voice-toggle" id="voice-toggle" title="Say 'Hi JARVIS' to activate">
+      <span class="mic-icon"></span>
+      <span id="voice-toggle-text">Activate Voice</span>
+    </button>
   </div>
 
   <!-- ============ TABS ============ -->
@@ -444,9 +900,16 @@
 
   <div class="footer">
     <span class="arc-mini"></span>
-    J.A.R.V.I.S PERSONAL · ALL DATA STORED LOCALLY IN YOUR BROWSER
+    STARK INDUSTRIES SECURE PROTOCOL · LOCAL ENCRYPTION ACTIVE · ALL SYSTEMS NOMINAL
     <span class="arc-mini"></span>
   </div>
+</div>
+
+<!-- Voice listening overlay -->
+<div class="voice-overlay" id="voice-overlay">
+  <span class="pulse-dot"></span>
+  <span>Listening</span>
+  <span class="transcript" id="voice-transcript"></span>
 </div>
 
 <script>
@@ -1356,6 +1819,347 @@ window.resetData = function(){
   alert('All data has been reset.');
 };
 
+// ============ IDEAS GENERATOR ============
+// Personalized suggestions based on what user has been doing
+const LEARNING_IDEAS = [
+  {topic: "AI prompt engineering", why: "highly leveraged skill, applies across every domain"},
+  {topic: "System design fundamentals", why: "separates senior from mid-level operators"},
+  {topic: "Negotiation by Chris Voss", why: "the 1 skill that pays back 100x — meetings, salary, deals"},
+  {topic: "Spreadsheet modeling (advanced Excel/Sheets)", why: "underrated superpower for analysis and planning"},
+  {topic: "Public speaking via Toastmasters", why: "compounds career growth more than any technical skill"},
+  {topic: "Writing well (Bird by Bird, On Writing Well)", why: "your emails, docs, and slides all improve at once"},
+  {topic: "First principles thinking", why: "stop reasoning by analogy, start solving from fundamentals"},
+  {topic: "Effective delegation", why: "the only way to scale beyond your own hours"},
+  {topic: "Customer interview techniques (Mom Test)", why: "learn what people actually need vs what they say"},
+  {topic: "Financial literacy basics", why: "P&L, cash flow, unit economics — language of business"},
+  {topic: "Data visualization principles", why: "make your insights actually land in presentations"},
+  {topic: "Cognitive biases (Thinking Fast and Slow)", why: "spot your own bad reasoning before it costs you"},
+  {topic: "Async communication craft", why: "best docs replace 3 meetings — high leverage"},
+  {topic: "OKR / goal setting frameworks", why: "clarity on what matters separates output from busywork"},
+  {topic: "Time-blocking & deep work practice", why: "Cal Newport methodology, measurable focus gains"}
+];
+
+const VALUE_ADD_IDEAS = [
+  {idea: "Document a process you've done 3+ times", why: "creates leverage — others can do it, freeing you up"},
+  {idea: "Propose a 1-pager review to a stuck project", why: "force clarity, surface hidden blockers"},
+  {idea: "Start a weekly wins journal", why: "kills imposter syndrome, builds review/promotion case"},
+  {idea: "Map dependencies in your top project", why: "spot risks before they become fires"},
+  {idea: "Run a retrospective on your last deliverable", why: "compound learning from every cycle"},
+  {idea: "Identify one repetitive task to automate", why: "every hour saved compounds weekly"},
+  {idea: "Build a personal knowledge base (Notion/Obsidian)", why: "second brain pays back forever"},
+  {idea: "Schedule a skip-level coffee chat", why: "visibility + perspective you can't get otherwise"},
+  {idea: "Write a 'what I learned this quarter' summary", why: "shareable proof of growth"},
+  {idea: "Audit your meeting calendar — cut 1", why: "if your time is your money, this is a raise"},
+  {idea: "Make a 'no' list — things you'll stop doing", why: "focus is subtraction, not addition"},
+  {idea: "Send a 5-min Friday recap to your manager", why: "stay top-of-mind without extra meetings"},
+  {idea: "Identify a cross-functional pain point and propose a fix", why: "career rocket fuel — solving others' problems"},
+  {idea: "Set up automated metrics dashboard for your work", why: "easier reviews, clearer wins"},
+  {idea: "Coach/mentor someone junior", why: "teaching is the deepest form of learning"}
+];
+
+function getPersonalizedIdeas(){
+  // Personalize based on what user is doing
+  const completed = state.tasks.filter(t => t.completed);
+  const recentTypes = {meeting:0, deliverable:0, learning:0};
+  completed.slice(-10).forEach(t => recentTypes[t.type]++);
+  
+  // Get 1 random learning idea
+  const learningIdea = LEARNING_IDEAS[Math.floor(Math.random() * LEARNING_IDEAS.length)];
+  
+  // Get 1 random value-add idea
+  const valueIdea = VALUE_ADD_IDEAS[Math.floor(Math.random() * VALUE_ADD_IDEAS.length)];
+  
+  // Contextual nudge based on patterns
+  let nudge = '';
+  if(recentTypes.meeting > recentTypes.deliverable * 2 && completed.length > 5){
+    nudge = "You're heavy on meetings lately — try blocking 2 hours of no-meeting deep work tomorrow.";
+  } else if(recentTypes.learning === 0 && completed.length > 5){
+    nudge = "No learning logged recently. 1 hour of focused growth pays back for years.";
+  } else if(recentTypes.deliverable > 5 && recentTypes.learning < 2){
+    nudge = "Strong shipping pace. Time to invest in growth — pick one skill to level up this month.";
+  } else {
+    nudge = "Solid mix across activity types. Keep this rhythm.";
+  }
+  
+  return {learningIdea, valueIdea, nudge};
+}
+
+// ============ VOICE ASSISTANT ============
+let recognition = null;
+let voiceEnabled = false;
+let voicesLoaded = false;
+let preferredVoice = null;
+
+// Load voices and pick the best JARVIS-sounding one
+function loadVoices(){
+  const voices = window.speechSynthesis.getVoices();
+  if(voices.length === 0) return;
+  
+  // Try to find a British male voice (JARVIS sounds British)
+  preferredVoice = voices.find(v => v.name.match(/Daniel|Google UK English Male|Microsoft George|Oliver/i))
+                || voices.find(v => v.lang === 'en-GB' && v.name.toLowerCase().includes('male'))
+                || voices.find(v => v.lang === 'en-GB')
+                || voices.find(v => v.lang.startsWith('en'))
+                || voices[0];
+  voicesLoaded = true;
+}
+
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  
+  // Cancel any ongoing speech
+  window.speechSynthesis.cancel();
+  
+  // Strip HTML for clean speech
+  const cleanText = text.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+  if(preferredVoice) utterance.voice = preferredVoice;
+  utterance.rate = 1.0;
+  utterance.pitch = 0.9;  // Slightly lower = more JARVIS
+  utterance.volume = 1.0;
+  
+  window.speechSynthesis.speak(utterance);
+}
+
+function showVoiceOverlay(show, transcript){
+  const overlay = document.getElementById('voice-overlay');
+  const transcriptEl = document.getElementById('voice-transcript');
+  if(show){
+    overlay.classList.add('show');
+    if(transcript) transcriptEl.textContent = transcript;
+  } else {
+    overlay.classList.remove('show');
+    transcriptEl.textContent = '';
+  }
+}
+
+function setArcReactorListening(listening){
+  const reactor = document.getElementById('arc-reactor');
+  if(listening) reactor.classList.add('listening');
+  else reactor.classList.remove('listening');
+}
+
+function generateJarvisBriefing(){
+  const userName = state.settings.userName || 'Sir';
+  const pending = state.tasks.filter(t => !t.completed);
+  const overdue = state.tasks.filter(t => isOverdue(t));
+  const todayTasks = state.tasks.filter(t => isToday(t.dueDate) && !t.completed);
+  const deliverables = pending.filter(t => t.type === 'deliverable');
+  const meetings = pending.filter(t => t.type === 'meeting');
+  
+  const {learningIdea, valueIdea, nudge} = getPersonalizedIdeas();
+  
+  let spokenText = `Good day, ${userName}. `;
+  let displayText = `<strong>Good day, ${userName}.</strong><br><br>`;
+  
+  // Deliverables briefing
+  if(deliverables.length === 0){
+    spokenText += "You have no pending deliverables. ";
+    displayText += "✅ No pending deliverables.<br>";
+  } else {
+    const top3 = deliverables.slice(0, 3);
+    spokenText += `You have ${deliverables.length} pending deliverable${deliverables.length>1?'s':''}. `;
+    displayText += `📦 <strong>${deliverables.length} pending deliverable${deliverables.length>1?'s':''}:</strong><ul>`;
+    top3.forEach(t => {
+      const dueTxt = t.dueDate ? `, due ${formatDate(t.dueDate)}` : '';
+      spokenText += `${t.title}${dueTxt}. `;
+      displayText += `<li>${escapeHtml(t.title)}${dueTxt}</li>`;
+    });
+    displayText += '</ul>';
+  }
+  
+  // Overdue alert
+  if(overdue.length > 0){
+    spokenText += `Warning: ${overdue.length} ${overdue.length>1?'tasks are':'task is'} overdue and require${overdue.length>1?'':'s'} immediate attention. `;
+    displayText += `<br>⚠️ <strong>${overdue.length} overdue ${overdue.length>1?'tasks':'task'}</strong> requiring attention.<br>`;
+  }
+  
+  // Today's meetings
+  if(meetings.length > 0){
+    const todayMeetings = meetings.filter(m => isToday(m.dueDate));
+    if(todayMeetings.length > 0){
+      spokenText += `You have ${todayMeetings.length} meeting${todayMeetings.length>1?'s':''} today. `;
+      displayText += `<br>👥 <strong>${todayMeetings.length} meeting${todayMeetings.length>1?'s':''} today.</strong><br>`;
+    }
+  }
+  
+  // Learning suggestion
+  spokenText += `My suggestion for learning: explore ${learningIdea.topic}. ${learningIdea.why}. `;
+  displayText += `<br>💡 <strong>Learning suggestion:</strong><br>Explore <strong>${learningIdea.topic}</strong> — ${learningIdea.why}.<br>`;
+  
+  // Value-add suggestion
+  spokenText += `For value add: ${valueIdea.idea}. ${valueIdea.why}. `;
+  displayText += `<br>🎯 <strong>Value-add idea:</strong><br>${valueIdea.idea} — ${valueIdea.why}.<br>`;
+  
+  // Contextual nudge
+  spokenText += nudge;
+  displayText += `<br>📊 <strong>Observation:</strong> ${nudge}`;
+  
+  return {spokenText, displayText};
+}
+
+function jarvisBriefingResponse(){
+  const {spokenText, displayText} = generateJarvisBriefing();
+  
+  // Switch to dashboard view to show the message
+  showView('dashboard');
+  
+  // Insert the response at the top of dashboard
+  setTimeout(() => {
+    const dashboardView = document.getElementById('view-dashboard');
+    const responseHtml = `
+      <div class="panel" id="jarvis-voice-response">
+        <div class="panel-title">🎙️ JARVIS RESPONSE · VOICE BRIEFING</div>
+        <div class="agent-message jarvis-voice">
+          <div class="agent-header">🤖 <span class="agent-name">JARVIS</span></div>
+          <div class="agent-body">${displayText}</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('jarvis-voice-response').remove()">Dismiss</button>
+        <button class="btn btn-sm" onclick="jarvisBriefingResponse()" style="margin-left:8px">🎙️ Repeat</button>
+      </div>
+    `;
+    
+    // Remove old response if any
+    const old = document.getElementById('jarvis-voice-response');
+    if(old) old.remove();
+    
+    dashboardView.insertAdjacentHTML('afterbegin', responseHtml);
+  }, 100);
+  
+  // Speak it
+  speak(spokenText);
+}
+
+window.jarvisBriefingResponse = jarvisBriefingResponse;
+
+function initVoiceRecognition(){
+  // Check browser support
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    return null;
+  }
+  
+  const rec = new SpeechRecognition();
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.lang = 'en-US';
+  
+  rec.onresult = (event) => {
+    let interim = '';
+    let final = '';
+    for(let i = event.resultIndex; i < event.results.length; i++){
+      const transcript = event.results[i][0].transcript;
+      if(event.results[i].isFinal){
+        final += transcript;
+      } else {
+        interim += transcript;
+      }
+    }
+    
+    const fullText = (final + interim).toLowerCase().trim();
+    showVoiceOverlay(true, final || interim);
+    
+    // Check for wake words
+    if(fullText.match(/\b(hi|hey|hello|ok)\s+jarvis\b/) || 
+       fullText.match(/\bjarvis\b.*\b(brief|update|status|deliverables|tasks|hello|hi)\b/)){
+      // Trigger briefing
+      console.log('Wake word detected:', fullText);
+      jarvisBriefingResponse();
+      
+      // Reset recognition to avoid retriggering on same phrase
+      rec.stop();
+      setTimeout(() => {
+        if(voiceEnabled){
+          try { rec.start(); } catch(e) {}
+        }
+      }, 4000);  // 4 sec cooldown
+    }
+  };
+  
+  rec.onerror = (event) => {
+    console.error('Voice error:', event.error);
+    if(event.error === 'not-allowed'){
+      alert('Microphone access denied. Click the mic icon in your browser address bar to allow.');
+      stopVoiceListening();
+    } else if(event.error === 'no-speech'){
+      // Normal — restart silently
+    }
+  };
+  
+  rec.onend = () => {
+    setArcReactorListening(false);
+    if(voiceEnabled){
+      // Auto-restart if still active
+      try { rec.start(); setArcReactorListening(true); } catch(e) {}
+    } else {
+      showVoiceOverlay(false);
+    }
+  };
+  
+  rec.onstart = () => {
+    setArcReactorListening(true);
+    showVoiceOverlay(true);
+  };
+  
+  return rec;
+}
+
+function startVoiceListening(){
+  if(!recognition){
+    recognition = initVoiceRecognition();
+    if(!recognition){
+      alert('Voice recognition is not supported in this browser. Try Chrome, Edge, or Safari.');
+      return;
+    }
+  }
+  
+  voiceEnabled = true;
+  try {
+    recognition.start();
+  } catch(e){
+    // Already started
+    console.log('Recognition already running');
+  }
+  
+  const btn = document.getElementById('voice-toggle');
+  const txt = document.getElementById('voice-toggle-text');
+  btn.classList.add('active');
+  txt.textContent = 'Listening...';
+  
+  // Welcome message
+  speak("JARVIS voice protocol activated. Say 'Hi JARVIS' anytime for a briefing.");
+}
+
+function stopVoiceListening(){
+  voiceEnabled = false;
+  if(recognition){
+    try { recognition.stop(); } catch(e) {}
+  }
+  setArcReactorListening(false);
+  showVoiceOverlay(false);
+  
+  const btn = document.getElementById('voice-toggle');
+  const txt = document.getElementById('voice-toggle-text');
+  btn.classList.remove('active');
+  txt.textContent = 'Activate Voice';
+  
+  window.speechSynthesis.cancel();
+}
+
+window.toggleVoice = function(){
+  if(voiceEnabled){
+    stopVoiceListening();
+  } else {
+    startVoiceListening();
+  }
+};
+
 // ============ ROUTING ============
 function renderCurrentView(){
   const activeTab = document.querySelector('.tab.active');
@@ -1373,6 +2177,9 @@ function renderCurrentView(){
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => showView(tab.dataset.view));
 });
+
+// Voice toggle button
+document.getElementById('voice-toggle').addEventListener('click', window.toggleVoice);
 
 updateHeaderStats();
 renderCurrentView();
