@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>J.A.R.V.I.S — Personal Productivity System</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:linear-gradient(135deg,#0a0e27 0%,#1a1f3a 50%,#0d1b3d 100%);
+    background-attachment:fixed;
+    color:#e6f1ff;
+    min-height:100vh;
+    padding:16px;
+  }
+  .container{max-width:1300px;margin:0 auto}
+
+  /* ============ HEADER ============ */
+  .header{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:20px;
+    padding:18px 24px;
+    background:rgba(0,212,255,0.05);
+    border:1px solid rgba(0,212,255,0.2);
+    border-radius:12px;
+  }
+  .arc-reactor{
+    width:50px;height:50px;
+    border-radius:50%;
+    background:radial-gradient(circle,#00d4ff 0%,#0088ff 60%,#003d80 100%);
+    box-shadow:0 0 30px rgba(0,212,255,0.6),inset 0 0 10px rgba(255,255,255,0.3);
+    animation:pulse 2s ease-in-out infinite;
+    flex-shrink:0;
+  }
+  @keyframes pulse{
+    0%,100%{box-shadow:0 0 30px rgba(0,212,255,0.6),inset 0 0 10px rgba(255,255,255,0.3)}
+    50%{box-shadow:0 0 50px rgba(0,212,255,0.9),inset 0 0 15px rgba(255,255,255,0.5)}
+  }
+  .header-text{flex:1}
+  h1{
+    margin:0;
+    font-size:22px;
+    font-weight:300;
+    letter-spacing:3px;
+    color:#00d4ff;
+    text-shadow:0 0 20px rgba(0,212,255,0.5);
+  }
+  .tagline{color:#8fa3c7;font-size:12px;margin-top:3px;letter-spacing:1px}
+  .header-stats{
+    display:flex;gap:20px;font-size:12px;
+  }
+  .stat{text-align:center}
+  .stat-value{font-size:18px;font-weight:600;color:#00d4ff}
+  .stat-label{color:#5a6f93;letter-spacing:1px;font-size:10px;text-transform:uppercase}
+
+  /* ============ TABS ============ */
+  .tabs{
+    display:flex;
+    gap:4px;
+    margin-bottom:16px;
+    padding:4px;
+    background:rgba(10,20,40,0.5);
+    border:1px solid rgba(0,212,255,0.15);
+    border-radius:10px;
+    overflow-x:auto;
+  }
+  .tab{
+    flex:1;
+    min-width:fit-content;
+    padding:10px 16px;
+    background:transparent;
+    border:none;
+    color:#8fa3c7;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:1px;
+    cursor:pointer;
+    border-radius:6px;
+    transition:all 0.2s;
+    font-family:inherit;
+    white-space:nowrap;
+  }
+  .tab:hover{background:rgba(0,212,255,0.08);color:#00d4ff}
+  .tab.active{
+    background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(0,136,255,0.15));
+    color:#00d4ff;
+    box-shadow:inset 0 -2px 0 #00d4ff;
+  }
+
+  /* ============ PANELS ============ */
+  .panel{
+    background:rgba(10,20,40,0.6);
+    border:1px solid rgba(0,212,255,0.2);
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:16px;
+    backdrop-filter:blur(10px);
+  }
+  .panel-title{
+    font-size:13px;
+    font-weight:500;
+    color:#00d4ff;
+    letter-spacing:2px;
+    margin:0 0 14px;
+    padding-bottom:10px;
+    border-bottom:1px solid rgba(0,212,255,0.2);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .panel-title .panel-action{
+    margin-left:auto;
+    font-size:11px;
+    letter-spacing:1px;
+  }
+  .view{display:none}
+  .view.active{display:block}
+
+  /* ============ FORMS ============ */
+  .form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:14px;
+  }
+  @media(max-width:700px){.form-grid{grid-template-columns:1fr}}
+  .form-grid.full{grid-template-columns:1fr}
+  .form-field label{
+    display:block;
+    font-size:11px;
+    color:#8fa3c7;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    margin-bottom:5px;
+  }
+  input,select,textarea{
+    width:100%;
+    padding:9px 12px;
+    background:rgba(0,0,0,0.3);
+    border:1px solid rgba(0,212,255,0.25);
+    border-radius:6px;
+    color:#e6f1ff;
+    font-size:13px;
+    font-family:inherit;
+    outline:none;
+    transition:border-color 0.2s;
+  }
+  input:focus,select:focus,textarea:focus{
+    border-color:#00d4ff;
+    box-shadow:0 0 8px rgba(0,212,255,0.2);
+  }
+  input::placeholder,textarea::placeholder{color:#5a6f93}
+  textarea{resize:vertical;min-height:60px;font-family:inherit}
+  select{cursor:pointer}
+  select option{background:#1a1f3a;color:#e6f1ff}
+
+  /* ============ BUTTONS ============ */
+  .btn{
+    padding:9px 18px;
+    background:linear-gradient(135deg,#00d4ff,#0088ff);
+    color:#0a0e27;
+    border:none;
+    border-radius:6px;
+    font-weight:600;
+    cursor:pointer;
+    font-size:13px;
+    letter-spacing:1px;
+    font-family:inherit;
+    transition:all 0.2s;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,212,255,0.4)}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+  .btn-secondary{
+    background:transparent;
+    color:#8fa3c7;
+    border:1px solid rgba(0,212,255,0.3);
+  }
+  .btn-secondary:hover{background:rgba(0,212,255,0.1);color:#00d4ff;transform:none;box-shadow:none}
+  .btn-danger{background:linear-gradient(135deg,#ff4757,#c41e3a);color:white}
+  .btn-sm{padding:5px 10px;font-size:11px}
+
+  /* ============ TYPE PICKER (Meeting/Deliverable/Learning) ============ */
+  .type-picker{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .type-btn{
+    padding:14px;
+    background:rgba(0,212,255,0.05);
+    border:1px solid rgba(0,212,255,0.2);
+    border-radius:8px;
+    color:#8fa3c7;
+    cursor:pointer;
+    text-align:center;
+    transition:all 0.2s;
+    font-family:inherit;
+  }
+  .type-btn:hover{background:rgba(0,212,255,0.1);color:#e6f1ff}
+  .type-btn.selected{
+    background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(0,136,255,0.15));
+    border-color:#00d4ff;
+    color:#00d4ff;
+  }
+  .type-btn .emoji{font-size:24px;display:block;margin-bottom:4px}
+  .type-btn .label{font-size:12px;font-weight:500;letter-spacing:1px}
+
+  /* ============ TASK LIST ============ */
+  .task-list{display:flex;flex-direction:column;gap:8px}
+  .task-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 14px;
+    background:rgba(0,212,255,0.05);
+    border-left:3px solid #00d4ff;
+    border-radius:0 8px 8px 0;
+    transition:all 0.2s;
+  }
+  .task-item:hover{background:rgba(0,212,255,0.08)}
+  .task-item.completed{opacity:0.55;border-left-color:#00ff88}
+  .task-item.overdue{border-left-color:#ff4757}
+  .task-item.completed .task-title{text-decoration:line-through}
+  .task-checkbox{
+    width:18px;height:18px;
+    border:2px solid rgba(0,212,255,0.4);
+    border-radius:4px;
+    cursor:pointer;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent;
+  }
+  .task-checkbox.checked{background:#00ff88;border-color:#00ff88}
+  .task-checkbox.checked::after{content:'✓';color:#0a0e27;font-weight:bold;font-size:12px}
+  .task-info{flex:1;min-width:0}
+  .task-title{font-size:14px;color:#e6f1ff;margin-bottom:3px;font-weight:500}
+  .task-meta{font-size:11px;color:#8fa3c7;display:flex;gap:10px;flex-wrap:wrap}
+  .task-meta span{display:inline-flex;align-items:center;gap:3px}
+  .task-actions{display:flex;gap:4px;opacity:0.7}
+  .icon-btn{
+    background:transparent;
+    border:1px solid rgba(0,212,255,0.2);
+    color:#8fa3c7;
+    width:26px;height:26px;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:12px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .icon-btn:hover{background:rgba(0,212,255,0.1);color:#00d4ff}
+  .icon-btn.delete:hover{background:rgba(255,71,87,0.2);color:#ff4757;border-color:#ff4757}
+
+  /* ============ BADGES ============ */
+  .badge{
+    display:inline-block;
+    font-size:10px;
+    padding:2px 8px;
+    border-radius:10px;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  .badge-meeting{background:rgba(187,134,252,0.2);color:#bb86fc}
+  .badge-deliverable{background:rgba(0,212,255,0.2);color:#00d4ff}
+  .badge-learning{background:rgba(255,180,0,0.2);color:#ffb400}
+  .badge-high{background:rgba(255,71,87,0.2);color:#ff6b7a}
+  .badge-medium{background:rgba(255,180,0,0.2);color:#ffb400}
+  .badge-low{background:rgba(0,255,136,0.2);color:#00ff88}
+  .badge-overdue{background:rgba(255,71,87,0.3);color:#ff6b7a;animation:pulse-badge 2s ease-in-out infinite}
+  @keyframes pulse-badge{0%,100%{opacity:1}50%{opacity:0.6}}
+
+  /* ============ DASHBOARD GRID ============ */
+  .dashboard-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:12px;
+    margin-bottom:16px;
+  }
+  .stat-card{
+    background:rgba(0,212,255,0.05);
+    border:1px solid rgba(0,212,255,0.2);
+    border-radius:10px;
+    padding:16px;
+  }
+  .stat-card .number{
+    font-size:28px;
+    font-weight:600;
+    color:#00d4ff;
+    margin:6px 0;
+  }
+  .stat-card .label{
+    font-size:11px;
+    color:#8fa3c7;
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  .stat-card.warning .number{color:#ffb400}
+  .stat-card.danger .number{color:#ff4757}
+  .stat-card.success .number{color:#00ff88}
+
+  /* ============ AGENT MESSAGES ============ */
+  .agent-message{
+    padding:14px 16px;
+    background:rgba(0,212,255,0.06);
+    border-left:3px solid #00d4ff;
+    border-radius:0 8px 8px 0;
+    margin-bottom:10px;
+    animation:slideIn 0.4s ease;
+  }
+  @keyframes slideIn{
+    from{opacity:0;transform:translateX(-10px)}
+    to{opacity:1;transform:translateX(0)}
+  }
+  .agent-message.tracker{border-left-color:#00d4ff}
+  .agent-message.coach{border-left-color:#ffb400}
+  .agent-message.analyst{border-left-color:#bb86fc}
+  .agent-header{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+    font-size:11px;
+    letter-spacing:1px;
+    font-weight:600;
+    text-transform:uppercase;
+  }
+  .agent-header .agent-name{color:#00d4ff}
+  .agent-message.coach .agent-name{color:#ffb400}
+  .agent-message.analyst .agent-name{color:#bb86fc}
+  .agent-body{font-size:13px;color:#e6f1ff;line-height:1.6}
+  .agent-body ul{margin:6px 0;padding-left:20px}
+  .agent-body li{margin:3px 0}
+  .agent-body strong{color:#00d4ff;font-weight:500}
+
+  /* ============ EMPTY STATES ============ */
+  .empty{
+    text-align:center;
+    padding:40px 20px;
+    color:#5a6f93;
+  }
+  .empty .icon{font-size:36px;margin-bottom:10px}
+
+  /* ============ CHART (custom CSS bars) ============ */
+  .chart-container{margin-top:14px}
+  .chart-row{
+    display:grid;
+    grid-template-columns:90px 1fr 50px;
+    gap:10px;
+    align-items:center;
+    margin-bottom:8px;
+    font-size:12px;
+  }
+  .chart-label{color:#8fa3c7}
+  .chart-bar-wrap{
+    background:rgba(0,212,255,0.08);
+    border-radius:4px;
+    height:18px;
+    overflow:hidden;
+  }
+  .chart-bar{
+    height:100%;
+    background:linear-gradient(90deg,#00d4ff,#0088ff);
+    border-radius:4px;
+    transition:width 0.5s ease;
+  }
+  .chart-bar.meeting{background:linear-gradient(90deg,#bb86fc,#9d6ae0)}
+  .chart-bar.deliverable{background:linear-gradient(90deg,#00d4ff,#0088ff)}
+  .chart-bar.learning{background:linear-gradient(90deg,#ffb400,#ff8800)}
+  .chart-value{color:#e6f1ff;font-weight:500;text-align:right}
+
+  /* ============ MISC ============ */
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .footer{text-align:center;margin-top:24px;color:#5a6f93;font-size:11px;letter-spacing:1px}
+  .footer .arc-mini{
+    display:inline-block;width:8px;height:8px;
+    border-radius:50%;background:#00d4ff;
+    box-shadow:0 0 8px #00d4ff;
+    vertical-align:middle;margin:0 4px;
+  }
+  .filter-bar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .filter-chip{
+    padding:5px 12px;
+    background:transparent;
+    border:1px solid rgba(0,212,255,0.25);
+    border-radius:14px;
+    color:#8fa3c7;
+    font-size:11px;
+    cursor:pointer;
+    font-family:inherit;
+    letter-spacing:0.5px;
+  }
+  .filter-chip:hover{color:#00d4ff;border-color:#00d4ff}
+  .filter-chip.active{background:rgba(0,212,255,0.15);color:#00d4ff;border-color:#00d4ff}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ============ HEADER ============ -->
+  <div class="header">
+    <div class="arc-reactor"></div>
+    <div class="header-text">
+      <h1>J.A.R.V.I.S</h1>
+      <div class="tagline">PERSONAL PRODUCTIVITY SYSTEM</div>
+    </div>
+    <div class="header-stats">
+      <div class="stat">
+        <div class="stat-value" id="header-today">0</div>
+        <div class="stat-label">Today</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="header-pending">0</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="header-week">0</div>
+        <div class="stat-label">This Week</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TABS ============ -->
+  <div class="tabs">
+    <button class="tab active" data-view="dashboard">📊 Dashboard</button>
+    <button class="tab" data-view="capture">➕ Log Work</button>
+    <button class="tab" data-view="tracker">📋 Tracker</button>
+    <button class="tab" data-view="coach">💡 Coach</button>
+    <button class="tab" data-view="analyst">📈 Analyst</button>
+    <button class="tab" data-view="settings">⚙️ Settings</button>
+  </div>
+
+  <!-- ============ VIEWS ============ -->
+  <div id="view-dashboard" class="view active"></div>
+  <div id="view-capture" class="view"></div>
+  <div id="view-tracker" class="view"></div>
+  <div id="view-coach" class="view"></div>
+  <div id="view-analyst" class="view"></div>
+  <div id="view-settings" class="view"></div>
+
+  <div class="footer">
+    <span class="arc-mini"></span>
+    J.A.R.V.I.S PERSONAL · ALL DATA STORED LOCALLY IN YOUR BROWSER
+    <span class="arc-mini"></span>
+  </div>
+</div>
+
+<script>
+// ============ APP STATE ============
+const STORAGE_KEY = 'jarvis_personal_v1';
+let state = loadState();
+
+function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e){console.error(e)}
+  return {
+    tasks: [],
+    settings: {
+      userName: 'Sir',
+      workHoursPerDay: 8,
+      goals: ''
+    },
+    createdAt: new Date().toISOString()
+  };
+}
+
+function saveState(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e){console.error(e)}
+}
+
+function uid(){return Date.now().toString(36) + Math.random().toString(36).substr(2,5)}
+
+// ============ DATE HELPERS ============
+function today(){return new Date().toISOString().split('T')[0]}
+function isToday(dateStr){return dateStr && dateStr.split('T')[0] === today()}
+function isThisWeek(dateStr){
+  if(!dateStr) return false;
+  const d = new Date(dateStr);
+  const now = new Date();
+  const start = new Date(now);
+  start.setDate(now.getDate() - now.getDay());
+  start.setHours(0,0,0,0);
+  return d >= start && d <= now;
+}
+function isOverdue(task){
+  if(!task.dueDate || task.completed) return false;
+  return new Date(task.dueDate) < new Date(today());
+}
+function daysAgo(dateStr){
+  if(!dateStr) return null;
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000*60*60*24));
+  return diff;
+}
+function formatDate(dateStr){
+  if(!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-GB', {day:'2-digit', month:'short'});
+}
+function todayLabel(){
+  return new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+}
+
+// ============ TASK FILTERS ============
+function getTasks(filter){
+  let tasks = state.tasks.slice();
+  if(filter==='today'){
+    tasks = tasks.filter(t => (t.dueDate && isToday(t.dueDate)) || isToday(t.createdAt));
+  } else if(filter==='pending'){
+    tasks = tasks.filter(t => !t.completed);
+  } else if(filter==='overdue'){
+    tasks = tasks.filter(t => isOverdue(t));
+  } else if(filter==='completed'){
+    tasks = tasks.filter(t => t.completed);
+  } else if(filter==='week'){
+    tasks = tasks.filter(t => isThisWeek(t.completedAt) || isThisWeek(t.createdAt));
+  }
+  return tasks.sort((a,b) => {
+    if(a.completed !== b.completed) return a.completed ? 1 : -1;
+    if(a.dueDate && b.dueDate) return new Date(a.dueDate) - new Date(b.dueDate);
+    if(a.dueDate) return -1;
+    if(b.dueDate) return 1;
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+}
+
+function updateHeaderStats(){
+  document.getElementById('header-today').textContent =
+    state.tasks.filter(t => isToday(t.dueDate) || (isToday(t.createdAt) && !t.completed)).length;
+  document.getElementById('header-pending').textContent =
+    state.tasks.filter(t => !t.completed).length;
+  document.getElementById('header-week').textContent =
+    state.tasks.filter(t => isThisWeek(t.completedAt)).length;
+}
+
+// ============ RENDER: TASK ITEM (shared) ============
+function renderTaskItem(task){
+  const overdue = isOverdue(task);
+  const typeBadge = task.type === 'meeting' ? '<span class="badge badge-meeting">Meeting</span>'
+                  : task.type === 'learning' ? '<span class="badge badge-learning">Learning</span>'
+                  : '<span class="badge badge-deliverable">Deliverable</span>';
+  const priorityBadge = task.priority === 'high' ? '<span class="badge badge-high">High</span>'
+                      : task.priority === 'low' ? '<span class="badge badge-low">Low</span>'
+                      : '<span class="badge badge-medium">Med</span>';
+  const overdueBadge = overdue ? '<span class="badge badge-overdue">Overdue</span>' : '';
+  const dueLine = task.dueDate ? `📅 ${formatDate(task.dueDate)}` : '';
+  const timeLine = task.timeSpent ? `⏱ ${task.timeSpent}h` : '';
+  const projectLine = task.project ? `📁 ${escapeHtml(task.project)}` : '';
+  
+  return `
+    <div class="task-item ${task.completed ? 'completed' : ''} ${overdue ? 'overdue' : ''}">
+      <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask('${task.id}')"></div>
+      <div class="task-info">
+        <div class="task-title">${escapeHtml(task.title)}</div>
+        <div class="task-meta">
+          ${typeBadge}
+          ${priorityBadge}
+          ${overdueBadge}
+          ${projectLine ? `<span>${projectLine}</span>` : ''}
+          ${dueLine ? `<span>${dueLine}</span>` : ''}
+          ${timeLine ? `<span>${timeLine}</span>` : ''}
+        </div>
+      </div>
+      <div class="task-actions">
+        <button class="icon-btn delete" onclick="deleteTask('${task.id}')" title="Delete">×</button>
+      </div>
+    </div>
+  `;
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+// ============ TASK ACTIONS ============
+window.toggleTask = function(id){
+  const t = state.tasks.find(x => x.id === id);
+  if(!t) return;
+  t.completed = !t.completed;
+  t.completedAt = t.completed ? new Date().toISOString() : null;
+  saveState();
+  renderCurrentView();
+  updateHeaderStats();
+};
+
+window.deleteTask = function(id){
+  if(!confirm('Delete this task?')) return;
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  saveState();
+  renderCurrentView();
+  updateHeaderStats();
+};
+
+window.showView = function(name){
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const tab = document.querySelector(`.tab[data-view="${name}"]`);
+  if(tab) tab.classList.add('active');
+  document.getElementById('view-' + name).classList.add('active');
+  renderCurrentView();
+};
+
+// ============ VIEW: DASHBOARD ============
+function renderDashboard(){
+  const todayTasks = state.tasks.filter(t => isToday(t.dueDate) || (isToday(t.createdAt) && !t.completed));
+  const pending = state.tasks.filter(t => !t.completed);
+  const overdue = state.tasks.filter(t => isOverdue(t));
+  const completedThisWeek = state.tasks.filter(t => isThisWeek(t.completedAt));
+  const hoursThisWeek = completedThisWeek.reduce((s,t) => s + (parseFloat(t.timeSpent) || 0), 0);
+  
+  const weekByType = {meeting:0, deliverable:0, learning:0};
+  completedThisWeek.forEach(t => weekByType[t.type] = (weekByType[t.type] || 0) + 1);
+  
+  let agentMessages = '';
+  
+  if(overdue.length > 0){
+    agentMessages += `
+      <div class="agent-message tracker">
+        <div class="agent-header">📋 <span class="agent-name">Tracker</span></div>
+        <div class="agent-body">
+          <strong>Sir, you have ${overdue.length} overdue ${overdue.length===1?'task':'tasks'}.</strong>
+          <ul>
+            ${overdue.slice(0,3).map(t => `<li>${escapeHtml(t.title)} — ${daysAgo(t.dueDate)} ${daysAgo(t.dueDate)===1?'day':'days'} late</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  } else if(pending.length > 0){
+    agentMessages += `
+      <div class="agent-message tracker">
+        <div class="agent-header">📋 <span class="agent-name">Tracker</span></div>
+        <div class="agent-body">
+          ${pending.length} ${pending.length===1?'task is':'tasks are'} pending. ${todayTasks.length > 0 ? `<strong>${todayTasks.length}</strong> due today.` : 'Nothing scheduled for today.'}
+        </div>
+      </div>
+    `;
+  }
+  
+  if(todayTasks.filter(t => !t.completed).length > 0){
+    const next = todayTasks.find(t => !t.completed);
+    let coachTip = '';
+    if(next.type === 'meeting'){
+      coachTip = `Prep 10 minutes before. Send a brief agenda. Set a hard end time.`;
+    } else if(next.type === 'deliverable'){
+      coachTip = `Block 90 minutes of deep work. Silence notifications. Define "done" before starting.`;
+    } else {
+      coachTip = `Active learning beats passive — write notes, build something, or teach it to someone after.`;
+    }
+    agentMessages += `
+      <div class="agent-message coach">
+        <div class="agent-header">💡 <span class="agent-name">Coach</span></div>
+        <div class="agent-body">
+          <strong>Next up:</strong> ${escapeHtml(next.title)}<br>
+          ${coachTip}
+        </div>
+      </div>
+    `;
+  }
+  
+  if(completedThisWeek.length > 0){
+    const dailyAvg = (completedThisWeek.length / 7).toFixed(1);
+    agentMessages += `
+      <div class="agent-message analyst">
+        <div class="agent-header">📈 <span class="agent-name">Analyst</span></div>
+        <div class="agent-body">
+          You've completed <strong>${completedThisWeek.length}</strong> tasks this week (${dailyAvg}/day avg) and logged <strong>${hoursThisWeek.toFixed(1)}h</strong>.
+          Mix: ${weekByType.meeting} meetings · ${weekByType.deliverable} deliverables · ${weekByType.learning} learning.
+        </div>
+      </div>
+    `;
+  }
+  
+  if(!agentMessages){
+    agentMessages = `
+      <div class="empty">
+        <div class="icon">🤖</div>
+        <div>Welcome, Sir. Add your first task to begin.</div>
+      </div>
+    `;
+  }
+  
+  let todayList = '';
+  if(todayTasks.length > 0){
+    todayList = `<div class="task-list">${todayTasks.slice(0,5).map(renderTaskItem).join('')}</div>`;
+  } else {
+    todayList = `<div class="empty"><div>Nothing scheduled for today. Enjoy the calm, Sir.</div></div>`;
+  }
+  
+  document.getElementById('view-dashboard').innerHTML = `
+    <div class="panel">
+      <div class="panel-title">🤖 AGENT BRIEFING · ${todayLabel().toUpperCase()}</div>
+      ${agentMessages}
+    </div>
+    
+    <div class="dashboard-grid">
+      <div class="stat-card"><div class="label">Today</div><div class="number">${todayTasks.length}</div></div>
+      <div class="stat-card warning"><div class="label">Pending</div><div class="number">${pending.length}</div></div>
+      <div class="stat-card ${overdue.length > 0 ? 'danger' : ''}"><div class="label">Overdue</div><div class="number">${overdue.length}</div></div>
+      <div class="stat-card success"><div class="label">Done This Week</div><div class="number">${completedThisWeek.length}</div></div>
+    </div>
+    
+    <div class="panel">
+      <div class="panel-title">📋 TODAY'S FOCUS
+        <button class="btn btn-secondary btn-sm panel-action" onclick="showView('capture')">+ Add Task</button>
+      </div>
+      ${todayList}
+    </div>
+  `;
+}
+
+// ============ VIEW: CAPTURE (LOG WORK) ============
+let captureType = 'deliverable';
+
+function renderCapture(){
+  document.getElementById('view-capture').innerHTML = `
+    <div class="panel">
+      <div class="panel-title">➕ LOG NEW WORK</div>
+      
+      <div class="type-picker">
+        <button class="type-btn ${captureType==='meeting'?'selected':''}" onclick="setCaptureType('meeting')">
+          <span class="emoji">👥</span>
+          <span class="label">MEETING</span>
+        </button>
+        <button class="type-btn ${captureType==='deliverable'?'selected':''}" onclick="setCaptureType('deliverable')">
+          <span class="emoji">📦</span>
+          <span class="label">DELIVERABLE</span>
+        </button>
+        <button class="type-btn ${captureType==='learning'?'selected':''}" onclick="setCaptureType('learning')">
+          <span class="emoji">📚</span>
+          <span class="label">LEARNING</span>
+        </button>
+      </div>
+      
+      <div class="form-grid full">
+        <div class="form-field">
+          <label>Title *</label>
+          <input type="text" id="cap-title" placeholder="${captureType==='meeting'?'e.g. Sync with design team':captureType==='learning'?'e.g. Read 2 chapters of System Design':'e.g. Send Q3 proposal to client'}" />
+        </div>
+      </div>
+      
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Project / Context</label>
+          <input type="text" id="cap-project" placeholder="optional" />
+        </div>
+        <div class="form-field">
+          <label>Priority</label>
+          <select id="cap-priority">
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Due Date</label>
+          <input type="date" id="cap-due" />
+        </div>
+        <div class="form-field">
+          <label>Est. Time (hours)</label>
+          <input type="number" id="cap-time" step="0.5" min="0" placeholder="e.g. 1.5" />
+        </div>
+      </div>
+      
+      <div class="form-grid full">
+        <div class="form-field">
+          <label>Notes / Outcome</label>
+          <textarea id="cap-notes" placeholder="What's this about? What does success look like?"></textarea>
+        </div>
+      </div>
+      
+      <div class="row">
+        <button class="btn" onclick="addTask()">SAVE TASK</button>
+        <button class="btn btn-secondary" onclick="clearCaptureForm()">CLEAR</button>
+        <div style="margin-left:auto;font-size:11px;color:#5a6f93">Tip: Set due date to today for instant focus</div>
+      </div>
+    </div>
+    
+    <div class="panel">
+      <div class="panel-title">⚡ QUICK ADD (3 of each type)</div>
+      <div style="font-size:12px;color:#8fa3c7;margin-bottom:12px">Click any template to pre-fill the form above:</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px">
+        <button class="btn btn-secondary" style="text-align:left" onclick="quickAdd('meeting','1:1 with manager')">👥 1:1 with manager</button>
+        <button class="btn btn-secondary" style="text-align:left" onclick="quickAdd('meeting','Team standup')">👥 Team standup</button>
+        <button class="btn btn-secondary" style="text-align:left" onclick="quickAdd('meeting','Client review call')">👥 Client review call</button>
+        <button class="btn btn-secondary" style="text-align:left" onclick="quickAdd('deliverable','Weekly report')">📦 Weekly report</button>
+        <button class="btn btn-secondary" style="text-align:left" onclick="quickAdd('deliverable','Project proposal')">📦 Project proposal</button>
+        <button class="btn btn-secondary" style="text-align:left" onclick="quickAdd('deliverable','Code review')">📦 Code review</button>
+        <button class="btn btn-secondary" style="text-align:left" onclick="quickAdd('learning','Read article/book')">📚 Read article/book</button>
+        <button class="btn btn-secondary" style="text-align:left" onclick="quickAdd('learning','Online course')">📚 Online course</button>
+        <button class="btn btn-secondary" style="text-align:left" onclick="quickAdd('learning','Tutorial/practice')">📚 Tutorial/practice</button>
+      </div>
+    </div>
+  `;
+}
+
+window.setCaptureType = function(type){
+  captureType = type;
+  renderCapture();
+};
+
+window.quickAdd = function(type, title){
+  captureType = type;
+  renderCapture();
+  setTimeout(() => {
+    document.getElementById('cap-title').value = title;
+    document.getElementById('cap-title').focus();
+  }, 50);
+};
+
+window.clearCaptureForm = function(){
+  document.getElementById('cap-title').value = '';
+  document.getElementById('cap-project').value = '';
+  document.getElementById('cap-priority').value = 'medium';
+  document.getElementById('cap-due').value = '';
+  document.getElementById('cap-time').value = '';
+  document.getElementById('cap-notes').value = '';
+};
+
+window.addTask = function(){
+  const title = document.getElementById('cap-title').value.trim();
+  if(!title){alert('Please enter a title'); return}
+  
+  const task = {
+    id: uid(),
+    type: captureType,
+    title,
+    project: document.getElementById('cap-project').value.trim(),
+    priority: document.getElementById('cap-priority').value,
+    dueDate: document.getElementById('cap-due').value || null,
+    timeSpent: parseFloat(document.getElementById('cap-time').value) || 0,
+    notes: document.getElementById('cap-notes').value.trim(),
+    completed: false,
+    createdAt: new Date().toISOString(),
+    completedAt: null
+  };
+  
+  state.tasks.push(task);
+  saveState();
+  clearCaptureForm();
+  updateHeaderStats();
+  
+  // Flash confirmation, then show tracker
+  const flash = document.createElement('div');
+  flash.style.cssText = 'position:fixed;top:20px;right:20px;background:#00ff88;color:#0a0e27;padding:12px 20px;border-radius:8px;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,255,136,0.4)';
+  flash.textContent = '✓ Task saved';
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 1500);
+};
+
+// ============ VIEW: TRACKER ============
+let trackerFilter = 'pending';
+
+function renderTracker(){
+  const filters = [
+    {id:'pending', label:'Pending'},
+    {id:'today', label:'Today'},
+    {id:'overdue', label:'Overdue'},
+    {id:'completed', label:'Completed'},
+    {id:'all', label:'All'}
+  ];
+  
+  const tasks = getTasks(trackerFilter);
+  const overdue = state.tasks.filter(t => isOverdue(t));
+  const dueSoon = state.tasks.filter(t => {
+    if(t.completed || !t.dueDate) return false;
+    const d = new Date(t.dueDate);
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 2);
+    return d <= tomorrow && d >= new Date(today());
+  });
+  
+  let trackerAlert = '';
+  if(overdue.length > 0){
+    trackerAlert = `
+      <div class="agent-message tracker">
+        <div class="agent-header">📋 <span class="agent-name">Tracker Agent reporting</span></div>
+        <div class="agent-body">
+          <strong>Status: ${overdue.length} overdue, ${dueSoon.length} due in next 48 hours.</strong>
+          <ul>
+            ${overdue.slice(0,5).map(t => `<li><strong>OVERDUE:</strong> ${escapeHtml(t.title)} (${daysAgo(t.dueDate)}d late)</li>`).join('')}
+            ${dueSoon.slice(0,5).map(t => `<li>Due soon: ${escapeHtml(t.title)} — ${formatDate(t.dueDate)}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  } else if(dueSoon.length > 0){
+    trackerAlert = `
+      <div class="agent-message tracker">
+        <div class="agent-header">📋 <span class="agent-name">Tracker Agent reporting</span></div>
+        <div class="agent-body">
+          ${dueSoon.length} ${dueSoon.length===1?'item':'items'} due in the next 48 hours:
+          <ul>${dueSoon.map(t => `<li>${escapeHtml(t.title)} — ${formatDate(t.dueDate)}</li>`).join('')}</ul>
+        </div>
+      </div>
+    `;
+  } else {
+    trackerAlert = `
+      <div class="agent-message tracker">
+        <div class="agent-header">📋 <span class="agent-name">Tracker Agent reporting</span></div>
+        <div class="agent-body">All clear, Sir. No overdue items, nothing due in the next 48 hours.</div>
+      </div>
+    `;
+  }
+  
+  let listHtml = '';
+  if(tasks.length === 0){
+    listHtml = `<div class="empty"><div class="icon">📭</div><div>No tasks match this filter.</div></div>`;
+  } else {
+    listHtml = `<div class="task-list">${tasks.map(renderTaskItem).join('')}</div>`;
+  }
+  
+  document.getElementById('view-tracker').innerHTML = `
+    <div class="panel">
+      <div class="panel-title">📋 TRACKER AGENT</div>
+      ${trackerAlert}
+    </div>
+    
+    <div class="panel">
+      <div class="panel-title">ALL TASKS
+        <button class="btn btn-secondary btn-sm panel-action" onclick="showView('capture')">+ Add</button>
+      </div>
+      <div class="filter-bar">
+        ${filters.map(f => `<button class="filter-chip ${trackerFilter===f.id?'active':''}" onclick="setTrackerFilter('${f.id}')">${f.label}</button>`).join('')}
+      </div>
+      ${listHtml}
+    </div>
+  `;
+}
+
+window.setTrackerFilter = function(f){
+  trackerFilter = f;
+  renderTracker();
+};
+
+// ============ VIEW: COACH ============
+function renderCoach(){
+  const pending = state.tasks.filter(t => !t.completed);
+  const allByType = {meeting:[], deliverable:[], learning:[]};
+  pending.forEach(t => allByType[t.type] && allByType[t.type].push(t));
+  
+  // Coach suggestions by task type
+  const meetingTips = [
+    "Send agenda 24h ahead — meetings without agendas run 30% longer",
+    "Default to 25/50 min instead of 30/60 — gives buffer for context switching",
+    "End every meeting with: who owns what, by when, success metric",
+    "If it could be an email, kill the meeting and write the email"
+  ];
+  const deliverableTips = [
+    "Define 'done' criteria before starting — prevents scope creep",
+    "Time-box at 90 min blocks with full-focus deep work, phone in another room",
+    "First draft = ugly draft. Edit on the second pass, not the first",
+    "If stuck > 20 min, write what you know + the specific gap, then ask"
+  ];
+  const learningTips = [
+    "Active recall beats re-reading 3x — close the tab and write what you learned",
+    "Teach it to a rubber duck (or colleague) within 24h to lock it in",
+    "Apply within 7 days or lose 70% of the value (forgetting curve)",
+    "Pick depth over breadth — 1 deep concept > 5 shallow tutorials"
+  ];
+  
+  function pickTip(tips){return tips[Math.floor(Math.random() * tips.length)]}
+  
+  let suggestions = '';
+  
+  if(pending.length === 0){
+    suggestions = `
+      <div class="empty">
+        <div class="icon">🎯</div>
+        <div>No pending tasks to coach on. Add a task to get personalized suggestions.</div>
+      </div>
+    `;
+  } else {
+    const next = pending.sort((a,b) => {
+      const order = {high:1, medium:2, low:3};
+      return (order[a.priority]||2) - (order[b.priority]||2);
+    })[0];
+    
+    let nextTip = '';
+    if(next.type === 'meeting') nextTip = pickTip(meetingTips);
+    else if(next.type === 'deliverable') nextTip = pickTip(deliverableTips);
+    else nextTip = pickTip(learningTips);
+    
+    suggestions += `
+      <div class="agent-message coach">
+        <div class="agent-header">💡 <span class="agent-name">Top priority right now</span></div>
+        <div class="agent-body">
+          <strong>${escapeHtml(next.title)}</strong> (${next.type}, ${next.priority} priority)
+          <br><br>
+          <strong>Coach's advice:</strong><br>
+          ${nextTip}
+        </div>
+      </div>
+    `;
+    
+    // Patterns from completed tasks
+    const completed = state.tasks.filter(t => t.completed);
+    if(completed.length >= 3){
+      const completedByType = {meeting:0, deliverable:0, learning:0};
+      completed.forEach(t => completedByType[t.type]++);
+      const dominant = Object.keys(completedByType).reduce((a,b) => completedByType[a] > completedByType[b] ? a : b);
+      const ratio = (completedByType[dominant] / completed.length * 100).toFixed(0);
+      
+      let patternInsight = '';
+      if(dominant === 'meeting' && ratio > 50){
+        patternInsight = `Over half of your completed work is meetings (${ratio}%). Consider: are these creating output, or just maintenance overhead? Try blocking 2 hours of "no-meeting time" daily for deliverables.`;
+      } else if(dominant === 'deliverable' && ratio > 50){
+        patternInsight = `You're heavy on shipping (${ratio}% deliverables). Make sure you're investing in learning — 10% of time on growth pays compound returns.`;
+      } else if(dominant === 'learning' && ratio > 40){
+        patternInsight = `Strong learning habit (${ratio}% of completed work). Now: how are you converting learning into shipped deliverables? Pair each course with a project.`;
+      } else {
+        patternInsight = `Healthy mix: ${completedByType.meeting} meetings, ${completedByType.deliverable} deliverables, ${completedByType.learning} learning items. Keep this balance.`;
+      }
+      
+      suggestions += `
+        <div class="agent-message coach">
+          <div class="agent-header">💡 <span class="agent-name">Pattern observation</span></div>
+          <div class="agent-body">${patternInsight}</div>
+        </div>
+      `;
+    }
+    
+    // Type-specific batch advice
+    if(allByType.meeting.length >= 3){
+      suggestions += `
+        <div class="agent-message coach">
+          <div class="agent-header">💡 <span class="agent-name">${allByType.meeting.length} meetings pending</span></div>
+          <div class="agent-body">
+            Batch your meetings — cluster them on 2 days max so the other days protect deep work.
+            ${pickTip(meetingTips)}
+          </div>
+        </div>
+      `;
+    }
+    if(allByType.deliverable.length >= 3){
+      suggestions += `
+        <div class="agent-message coach">
+          <div class="agent-header">💡 <span class="agent-name">${allByType.deliverable.length} deliverables pending</span></div>
+          <div class="agent-body">
+            Stack-rank by impact × urgency. Knock out the highest-impact one first when your energy is highest (usually morning).
+            ${pickTip(deliverableTips)}
+          </div>
+        </div>
+      `;
+    }
+    if(allByType.learning.length >= 2){
+      suggestions += `
+        <div class="agent-message coach">
+          <div class="agent-header">💡 <span class="agent-name">${allByType.learning.length} learning items pending</span></div>
+          <div class="agent-body">
+            Pair each one with a real task where you'll apply it. Learning without application is entertainment.
+            ${pickTip(learningTips)}
+          </div>
+        </div>
+      `;
+    }
+  }
+  
+  document.getElementById('view-coach').innerHTML = `
+    <div class="panel">
+      <div class="panel-title">💡 COACH AGENT · DO IT BETTER, FASTER</div>
+      ${suggestions}
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(0,212,255,0.15);font-size:11px;color:#5a6f93;letter-spacing:0.5px">
+        💭 Suggestions refresh each time you visit. Click the tab again for fresh angles.
+      </div>
+    </div>
+  `;
+}
+
+// ============ VIEW: ANALYST ============
+let analystPeriod = 'week';
+
+function renderAnalyst(){
+  const periods = [
+    {id:'week', label:'This Week'},
+    {id:'month', label:'This Month'},
+    {id:'year', label:'This Year'},
+    {id:'all', label:'All Time'}
+  ];
+  
+  // Filter tasks by period
+  function inPeriod(dateStr){
+    if(!dateStr) return false;
+    const d = new Date(dateStr);
+    const now = new Date();
+    if(analystPeriod === 'all') return true;
+    if(analystPeriod === 'week'){
+      const start = new Date(now);
+      start.setDate(now.getDate() - now.getDay());
+      start.setHours(0,0,0,0);
+      return d >= start;
+    }
+    if(analystPeriod === 'month'){
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }
+    if(analystPeriod === 'year'){
+      return d.getFullYear() === now.getFullYear();
+    }
+    return false;
+  }
+  
+  const completed = state.tasks.filter(t => t.completed && inPeriod(t.completedAt));
+  const created = state.tasks.filter(t => inPeriod(t.createdAt));
+  const totalHours = completed.reduce((s,t) => s + (parseFloat(t.timeSpent) || 0), 0);
+  
+  const byType = {meeting:0, deliverable:0, learning:0};
+  const hoursByType = {meeting:0, deliverable:0, learning:0};
+  completed.forEach(t => {
+    byType[t.type] = (byType[t.type] || 0) + 1;
+    hoursByType[t.type] = (hoursByType[t.type] || 0) + (parseFloat(t.timeSpent) || 0);
+  });
+  
+  const completionRate = created.length > 0 ? ((completed.length / created.length) * 100).toFixed(0) : 0;
+  
+  // Build the bar chart
+  const maxCount = Math.max(byType.meeting, byType.deliverable, byType.learning, 1);
+  const chartHtml = `
+    <div class="chart-container">
+      <div class="chart-row">
+        <div class="chart-label">Meetings</div>
+        <div class="chart-bar-wrap"><div class="chart-bar meeting" style="width:${(byType.meeting/maxCount*100)}%"></div></div>
+        <div class="chart-value">${byType.meeting}</div>
+      </div>
+      <div class="chart-row">
+        <div class="chart-label">Deliverables</div>
+        <div class="chart-bar-wrap"><div class="chart-bar deliverable" style="width:${(byType.deliverable/maxCount*100)}%"></div></div>
+        <div class="chart-value">${byType.deliverable}</div>
+      </div>
+      <div class="chart-row">
+        <div class="chart-label">Learning</div>
+        <div class="chart-bar-wrap"><div class="chart-bar learning" style="width:${(byType.learning/maxCount*100)}%"></div></div>
+        <div class="chart-value">${byType.learning}</div>
+      </div>
+    </div>
+  `;
+  
+  // Top projects
+  const byProject = {};
+  completed.forEach(t => {
+    if(t.project){
+      byProject[t.project] = (byProject[t.project] || 0) + 1;
+    }
+  });
+  const topProjects = Object.entries(byProject).sort((a,b) => b[1] - a[1]).slice(0, 5);
+  
+  // Generate insights
+  let insights = '';
+  if(completed.length === 0){
+    insights = `<div class="agent-body">Not enough data in this period to generate insights. Complete some tasks to unlock analysis.</div>`;
+  } else {
+    const insightList = [];
+    
+    if(byType.meeting > byType.deliverable * 1.5){
+      insightList.push(`⚠️ Meetings (${byType.meeting}) are outpacing deliverables (${byType.deliverable}). You may be over-coordinating.`);
+    } else if(byType.deliverable > byType.meeting * 2){
+      insightList.push(`✅ Strong output focus: ${byType.deliverable} deliverables vs ${byType.meeting} meetings.`);
+    }
+    
+    if(byType.learning === 0 && completed.length > 5){
+      insightList.push(`📚 Zero learning logged this period. Block time for growth — even 1 hour/week compounds.`);
+    } else if(byType.learning >= completed.length * 0.2){
+      insightList.push(`✅ Learning investment is healthy (${(byType.learning/completed.length*100).toFixed(0)}% of activity).`);
+    }
+    
+    if(completionRate < 60 && created.length > 5){
+      insightList.push(`⚠️ Completion rate is ${completionRate}% — you're creating tasks faster than finishing them. Be selective.`);
+    } else if(completionRate >= 80){
+      insightList.push(`✅ Excellent completion rate at ${completionRate}% — strong follow-through.`);
+    }
+    
+    if(totalHours > 0 && analystPeriod === 'week'){
+      const expectedWeekHours = state.settings.workHoursPerDay * 5;
+      const efficiency = (totalHours / expectedWeekHours * 100).toFixed(0);
+      insightList.push(`⏱ Logged ${totalHours.toFixed(1)}h of tracked work (${efficiency}% of available work hours).`);
+    }
+    
+    if(topProjects.length > 0){
+      insightList.push(`🎯 Most active project: <strong>${escapeHtml(topProjects[0][0])}</strong> with ${topProjects[0][1]} completed tasks.`);
+    }
+    
+    insights = `<ul>${insightList.map(i => `<li>${i}</li>`).join('')}</ul>`;
+  }
+  
+  // Outcome forecast
+  let forecast = '';
+  if(completed.length >= 5 && analystPeriod !== 'all'){
+    const periodLabel = analystPeriod === 'week' ? 'next week' : analystPeriod === 'month' ? 'next month' : 'next year';
+    const projection = analystPeriod === 'week' ? completed.length : completed.length;
+    forecast = `
+      <div class="agent-message analyst">
+        <div class="agent-header">📈 <span class="agent-name">Outcome forecast</span></div>
+        <div class="agent-body">
+          At your current pace, you're on track for approximately <strong>${projection}</strong> completed tasks ${periodLabel}.
+          ${byType.deliverable > 0 ? `Roughly ${Math.round(byType.deliverable * (analystPeriod === 'week' ? 4 : 12))} deliverables shipped if you keep this up.` : ''}
+        </div>
+      </div>
+    `;
+  }
+  
+  document.getElementById('view-analyst').innerHTML = `
+    <div class="panel">
+      <div class="panel-title">📈 ANALYST AGENT · PERFORMANCE REVIEW</div>
+      <div class="filter-bar">
+        ${periods.map(p => `<button class="filter-chip ${analystPeriod===p.id?'active':''}" onclick="setAnalystPeriod('${p.id}')">${p.label}</button>`).join('')}
+      </div>
+      
+      <div class="dashboard-grid">
+        <div class="stat-card success"><div class="label">Completed</div><div class="number">${completed.length}</div></div>
+        <div class="stat-card"><div class="label">Hours Logged</div><div class="number">${totalHours.toFixed(1)}</div></div>
+        <div class="stat-card warning"><div class="label">Completion Rate</div><div class="number">${completionRate}%</div></div>
+        <div class="stat-card"><div class="label">Created</div><div class="number">${created.length}</div></div>
+      </div>
+      
+      <div class="agent-message analyst">
+        <div class="agent-header">📈 <span class="agent-name">Activity breakdown</span></div>
+        <div class="agent-body">
+          ${chartHtml}
+        </div>
+      </div>
+      
+      ${topProjects.length > 0 ? `
+        <div class="agent-message analyst">
+          <div class="agent-header">📈 <span class="agent-name">Top projects</span></div>
+          <div class="agent-body">
+            <ul>${topProjects.map(([p,c]) => `<li><strong>${escapeHtml(p)}</strong> — ${c} task${c>1?'s':''}</li>`).join('')}</ul>
+          </div>
+        </div>
+      ` : ''}
+      
+      <div class="agent-message analyst">
+        <div class="agent-header">📈 <span class="agent-name">Insights & observations</span></div>
+        ${insights}
+      </div>
+      
+      ${forecast}
+    </div>
+  `;
+}
+
+window.setAnalystPeriod = function(p){
+  analystPeriod = p;
+  renderAnalyst();
+};
+
+// ============ VIEW: SETTINGS ============
+function renderSettings(){
+  document.getElementById('view-settings').innerHTML = `
+    <div class="panel">
+      <div class="panel-title">⚙️ SETTINGS</div>
+      
+      <div class="form-grid">
+        <div class="form-field">
+          <label>How JARVIS Addresses You</label>
+          <input type="text" id="set-name" value="${escapeHtml(state.settings.userName)}" placeholder="Sir" />
+        </div>
+        <div class="form-field">
+          <label>Work Hours Per Day</label>
+          <input type="number" id="set-hours" value="${state.settings.workHoursPerDay}" min="1" max="24" />
+        </div>
+      </div>
+      
+      <div class="form-grid full">
+        <div class="form-field">
+          <label>Your Goals (visible to all agents)</label>
+          <textarea id="set-goals" placeholder="e.g. Ship product v2, learn React, lead 3 client projects">${escapeHtml(state.settings.goals)}</textarea>
+        </div>
+      </div>
+      
+      <button class="btn" onclick="saveSettings()">SAVE SETTINGS</button>
+    </div>
+    
+    <div class="panel">
+      <div class="panel-title">💾 DATA MANAGEMENT</div>
+      <div style="font-size:13px;color:#8fa3c7;margin-bottom:14px;line-height:1.6">
+        All your data is stored in your browser's localStorage. Nothing is sent to any server.
+        Currently storing: <strong style="color:#00d4ff">${state.tasks.length} tasks</strong>.
+      </div>
+      <div class="row">
+        <button class="btn btn-secondary" onclick="exportData()">↓ EXPORT DATA (JSON)</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">↑ IMPORT DATA</button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)" />
+        <button class="btn btn-danger" onclick="resetData()">⚠ RESET ALL DATA</button>
+      </div>
+    </div>
+    
+    <div class="panel">
+      <div class="panel-title">ℹ️ ABOUT</div>
+      <div style="font-size:13px;color:#8fa3c7;line-height:1.7">
+        <strong style="color:#00d4ff">J.A.R.V.I.S Personal Productivity System</strong><br>
+        Multi-agent system tracking meetings, deliverables, and learning.<br><br>
+        <strong style="color:#00d4ff">Active agents:</strong><br>
+        • 📋 <strong>Tracker</strong> — monitors pending and overdue work<br>
+        • 💡 <strong>Coach</strong> — suggests ways to do tasks faster and better<br>
+        • 📈 <strong>Analyst</strong> — generates weekly/monthly/yearly analysis
+      </div>
+    </div>
+  `;
+}
+
+window.saveSettings = function(){
+  state.settings.userName = document.getElementById('set-name').value.trim() || 'Sir';
+  state.settings.workHoursPerDay = parseInt(document.getElementById('set-hours').value) || 8;
+  state.settings.goals = document.getElementById('set-goals').value.trim();
+  saveState();
+  alert('Settings saved.');
+};
+
+window.exportData = function(){
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `jarvis-backup-${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+window.importData = function(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if(!imported.tasks){alert('Invalid backup file'); return}
+      if(!confirm(`Import ${imported.tasks.length} tasks? This will replace your current data.`)) return;
+      state = imported;
+      saveState();
+      renderCurrentView();
+      updateHeaderStats();
+      alert('Data imported successfully.');
+    } catch(err){
+      alert('Error importing: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+};
+
+window.resetData = function(){
+  if(!confirm('This will delete ALL your tasks and settings. Are you sure?')) return;
+  if(!confirm('Really sure? This cannot be undone.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state = loadState();
+  renderCurrentView();
+  updateHeaderStats();
+  alert('All data has been reset.');
+};
+
+// ============ ROUTING ============
+function renderCurrentView(){
+  const activeTab = document.querySelector('.tab.active');
+  if(!activeTab) return;
+  const view = activeTab.dataset.view;
+  if(view === 'dashboard') renderDashboard();
+  else if(view === 'capture') renderCapture();
+  else if(view === 'tracker') renderTracker();
+  else if(view === 'coach') renderCoach();
+  else if(view === 'analyst') renderAnalyst();
+  else if(view === 'settings') renderSettings();
+}
+
+// ============ INIT ============
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => showView(tab.dataset.view));
+});
+
+updateHeaderStats();
+renderCurrentView();
+</script>
+</body>
+</html>
